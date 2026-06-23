@@ -1,0 +1,293 @@
+/* ============================================================
+   circuit.css — Circuit Editor Styles
+   ============================================================
+   The circuit editor is a DOM-based grid where:
+     - Each row is a qubit wire (q0–q7)
+     - Each column is a time-step
+     - Gates are placed on grid cells
+     - SVG overlays draw control lines
+   ============================================================ */
+
+/* ── Circuit Container ───────────────────────────────────── */
+.circuit-container {
+  position: relative;
+  min-width: 100%;
+  min-height: 100%;
+  padding: var(--sp-4);
+  padding-left: 60px;            /* room for qubit labels */
+}
+
+/* ── Qubit Labels (left edge) ────────────────────────────── */
+.qubit-labels {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: var(--sp-4);
+  left: 0;
+  width: 56px;
+}
+
+.qubit-label {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+  border-right: 1px solid var(--border-color);
+  user-select: none;
+}
+
+.qubit-label span {
+  color: var(--accent-cyan);
+}
+
+/* ── Wire Grid ───────────────────────────────────────────── */
+.circuit-grid {
+  display: grid;
+  grid-template-rows: repeat(8, 48px);
+  grid-auto-columns: 48px;
+  grid-auto-flow: column;
+  gap: 0;
+  position: relative;
+}
+
+/* ── Qubit Wire (horizontal line) ────────────────────────── */
+.circuit-wire {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--border-color);
+  pointer-events: none;
+}
+
+/* ── Grid Cell (drop target) ─────────────────────────────── */
+.circuit-cell {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  position: relative;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+/* Horizontal wire through each cell */
+.circuit-cell::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  background: var(--border-light);
+  transform: translateY(-50%);
+  z-index: 0;
+}
+
+.circuit-cell:hover {
+  background: rgba(0, 212, 255, 0.04);
+  border-color: var(--border-accent);
+}
+
+.circuit-cell.drag-over {
+  background: rgba(0, 212, 255, 0.08);
+  border-color: var(--accent-cyan);
+  box-shadow: inset 0 0 12px rgba(0, 212, 255, 0.1);
+}
+
+.circuit-cell.invalid-drop {
+  background: rgba(255, 68, 102, 0.05);
+  border-color: rgba(255, 68, 102, 0.3);
+}
+
+/* ── Gate on Circuit ─────────────────────────────────────── */
+.circuit-gate {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  color: #fff;
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+  animation: gateAppear 0.2s var(--ease-out) forwards;
+}
+
+@keyframes gateAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.circuit-gate:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.4);
+}
+
+.circuit-gate.selected {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ── Gate Color Backgrounds ──────────────────────────────── */
+.circuit-gate[data-type="H"]       { background: var(--gate-h); }
+.circuit-gate[data-type="X"]       { background: var(--gate-x); }
+.circuit-gate[data-type="Y"]       { background: var(--gate-y); }
+.circuit-gate[data-type="Z"]       { background: var(--gate-z); }
+.circuit-gate[data-type="S"]       { background: var(--gate-s); }
+.circuit-gate[data-type="SDG"]     { background: var(--gate-s); }
+.circuit-gate[data-type="T"]       { background: var(--gate-t); }
+.circuit-gate[data-type="TDG"]     { background: var(--gate-t); }
+.circuit-gate[data-type="P"]       { background: var(--gate-p); }
+.circuit-gate[data-type="RX"]      { background: var(--gate-rx); }
+.circuit-gate[data-type="RY"]      { background: var(--gate-ry); }
+.circuit-gate[data-type="RZ"]      { background: var(--gate-rz); }
+.circuit-gate[data-type="CX"]      { background: var(--gate-cx); }
+.circuit-gate[data-type="CY"]      { background: var(--gate-cy); }
+.circuit-gate[data-type="CZ"]      { background: var(--gate-cz); }
+.circuit-gate[data-type="SWAP"]    { background: var(--gate-swap); }
+.circuit-gate[data-type="MEASURE"] { background: var(--gate-measure); color: #000; }
+.circuit-gate[data-type="RESET"]   { background: var(--gate-reset); }
+.circuit-gate[data-type="CCX"]     { background: var(--gate-ccx); }
+.circuit-gate[data-type="QFT"]     { background: var(--gate-qft); }
+.circuit-gate[data-type="IQFT"]    { background: var(--gate-iqft); }
+
+/* ── Measure Icon ────────────────────────────────────────── */
+.circuit-gate[data-type="MEASURE"]::after {
+  content: '📏';
+  font-size: 14px;
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+}
+
+/* ── Control Dot ─────────────────────────────────────────── */
+.control-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  border: 2px solid var(--accent-cyan);
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* ── Vertical Control Line (SVG overlay or CSS) ──────────── */
+.control-line {
+  position: absolute;
+  width: 2px;
+  background: var(--accent-cyan);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* ── SWAP × Symbol ───────────────────────────────────────── */
+.swap-cross {
+  font-size: 20px;
+  font-weight: var(--fw-bold);
+  color: #fff;
+}
+
+/* ── Column Number (top) ─────────────────────────────────── */
+.circuit-col-header {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: var(--fw-medium);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* ── SVG Overlay for Control Lines ───────────────────────── */
+.circuit-svg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.circuit-svg-overlay line {
+  stroke: var(--accent-cyan);
+  stroke-width: 2;
+  opacity: 0.7;
+}
+
+.circuit-svg-overlay circle {
+  fill: var(--text-primary);
+  stroke: var(--accent-cyan);
+  stroke-width: 2;
+}
+
+/* ── "Add Column" Button ─────────────────────────────────── */
+.add-column-btn {
+  width: 48px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: var(--fs-lg);
+  cursor: pointer;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.add-column-btn:hover {
+  background: var(--bg-hover);
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+}
+
+/* ── Empty State ─────────────────────────────────────────── */
+.circuit-empty-hint {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: var(--fs-base);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.circuit-empty-hint .hint-icon {
+  font-size: 2rem;
+  margin-bottom: var(--sp-2);
+}

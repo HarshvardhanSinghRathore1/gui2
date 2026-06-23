@@ -1,0 +1,189 @@
+/* ============================================================
+   gates.css — Gate Palette Styles
+   ============================================================
+   Styles for the left sidebar gate palette. Each gate is a
+   draggable card with a colored accent and icon/label.
+   ============================================================ */
+
+/* ── Gate Category ───────────────────────────────────────── */
+.gate-category {
+  margin-bottom: var(--sp-3);
+}
+
+.gate-category-title {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: var(--sp-2) var(--sp-3);
+  margin-bottom: var(--sp-1);
+}
+
+/* ── Gate Grid ───────────────────────────────────────────── */
+.gate-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-1);
+  padding: 0 var(--sp-2);
+}
+
+/* ── Gate Card ───────────────────────────────────────────── */
+.gate-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: var(--sp-2) var(--sp-1);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  cursor: grab;
+  user-select: none;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+  min-height: 48px;
+}
+
+.gate-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gate-color, var(--accent-cyan));
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+}
+
+.gate-card:hover {
+  background: var(--bg-hover);
+  border-color: var(--gate-color, var(--accent-cyan));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.gate-card:hover::before {
+  opacity: 1;
+}
+
+.gate-card:active {
+  cursor: grabbing;
+  transform: scale(0.95);
+}
+
+.gate-card.dragging {
+  opacity: 0.4;
+}
+
+/* ── Gate Icon (the letter/symbol inside the gate box) ──── */
+.gate-icon {
+  font-family: var(--font-mono);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-bold);
+  color: var(--gate-color, var(--accent-cyan));
+  line-height: 1;
+}
+
+/* ── Gate Label ──────────────────────────────────────────── */
+.gate-label {
+  font-size: 9px;
+  font-weight: var(--fw-medium);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+/* ── Gate Color Variants ─────────────────────────────────── */
+.gate-card[data-gate="H"]       { --gate-color: var(--gate-h); }
+.gate-card[data-gate="X"]       { --gate-color: var(--gate-x); }
+.gate-card[data-gate="Y"]       { --gate-color: var(--gate-y); }
+.gate-card[data-gate="Z"]       { --gate-color: var(--gate-z); }
+.gate-card[data-gate="S"]       { --gate-color: var(--gate-s); }
+.gate-card[data-gate="SDG"]     { --gate-color: var(--gate-s); }
+.gate-card[data-gate="T"]       { --gate-color: var(--gate-t); }
+.gate-card[data-gate="TDG"]     { --gate-color: var(--gate-t); }
+.gate-card[data-gate="P"]       { --gate-color: var(--gate-p); }
+.gate-card[data-gate="RX"]      { --gate-color: var(--gate-rx); }
+.gate-card[data-gate="RY"]      { --gate-color: var(--gate-ry); }
+.gate-card[data-gate="RZ"]      { --gate-color: var(--gate-rz); }
+.gate-card[data-gate="CX"]      { --gate-color: var(--gate-cx); }
+.gate-card[data-gate="CY"]      { --gate-color: var(--gate-cy); }
+.gate-card[data-gate="CZ"]      { --gate-color: var(--gate-cz); }
+.gate-card[data-gate="SWAP"]    { --gate-color: var(--gate-swap); }
+.gate-card[data-gate="MEASURE"] { --gate-color: var(--gate-measure); }
+.gate-card[data-gate="RESET"]   { --gate-color: var(--gate-reset); }
+.gate-card[data-gate="CCX"]     { --gate-color: var(--gate-ccx); }
+.gate-card[data-gate="QFT"]     { --gate-color: var(--gate-qft); }
+.gate-card[data-gate="IQFT"]    { --gate-color: var(--gate-iqft); }
+
+/* ── Drag Ghost ──────────────────────────────────────────── */
+.gate-drag-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: var(--z-drag);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  border: 2px solid var(--accent-cyan);
+  box-shadow: var(--shadow-lg), var(--shadow-glow-cyan);
+  font-family: var(--font-mono);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-bold);
+  color: var(--accent-cyan);
+  opacity: 0.9;
+}
+
+/* ── Tooltip (shows gate description on hover) ───────────── */
+.gate-tooltip {
+  position: absolute;
+  left: 110%;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  z-index: var(--z-tooltip);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  box-shadow: var(--shadow-md);
+}
+
+.gate-card:hover .gate-tooltip {
+  opacity: 1;
+}
+
+/* ── Search Box in Sidebar ───────────────────────────────── */
+.gate-search {
+  padding: var(--sp-3);
+}
+
+.gate-search input {
+  width: 100%;
+  padding: var(--sp-2) var(--sp-3);
+  font-size: var(--fs-sm);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+}
+
+.gate-search input::placeholder {
+  color: var(--text-muted);
+}

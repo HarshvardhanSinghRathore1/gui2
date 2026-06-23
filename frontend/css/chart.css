@@ -1,0 +1,174 @@
+/* ============================================================
+   chart.css — Probability Distribution Chart Styles
+   ============================================================
+   The bottom panel shows simulation results as a Chart.js bar
+   chart. This file styles the container, empty state, and
+   result summary.
+   ============================================================ */
+
+/* ── Chart Container ─────────────────────────────────────── */
+.chart-container {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+  padding: var(--sp-3);
+  gap: var(--sp-4);
+}
+
+/* ── Chart Canvas Wrapper ────────────────────────────────── */
+.chart-canvas-wrap {
+  flex: 1;
+  position: relative;
+  min-width: 0;       /* prevent flex overflow */
+}
+
+.chart-canvas-wrap canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ── Results Summary Sidebar ─────────────────────────────── */
+.chart-summary {
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  overflow-y: auto;
+  padding-right: var(--sp-2);
+}
+
+.chart-summary-title {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--sp-1);
+}
+
+/* ── Summary Stat Card ───────────────────────────────────── */
+.chart-stat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.chart-stat-label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+
+.chart-stat-value {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--accent-cyan);
+}
+
+/* ── Shots Info ──────────────────────────────────────────── */
+.chart-shots-info {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  text-align: center;
+  padding: var(--sp-1);
+}
+
+/* ── Empty State ─────────────────────────────────────────── */
+.chart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  gap: var(--sp-2);
+  color: var(--text-muted);
+}
+
+.chart-empty-icon {
+  font-size: 2rem;
+  opacity: 0.4;
+}
+
+.chart-empty-text {
+  font-size: var(--fs-sm);
+  opacity: 0.6;
+}
+
+.chart-empty-hint {
+  font-size: var(--fs-xs);
+  opacity: 0.4;
+}
+
+/* ── Loading State ───────────────────────────────────────── */
+.chart-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: var(--sp-3);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+}
+
+.chart-loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-top-color: var(--accent-cyan);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+/* ── Chart Tooltip (Chart.js custom) ─────────────────────── */
+.chart-custom-tooltip {
+  background: var(--bg-panel) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--sp-2) var(--sp-3) !important;
+  font-family: var(--font-mono) !important;
+  font-size: var(--fs-xs) !important;
+  color: var(--text-primary) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* ── Top States List ─────────────────────────────────────── */
+.top-states-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.top-state-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-xs);
+  font-family: var(--font-mono);
+}
+
+.top-state-bar {
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--accent-cyan);
+  transition: width var(--transition-base);
+}
+
+.top-state-label {
+  color: var(--text-secondary);
+  min-width: 70px;
+}
+
+.top-state-prob {
+  color: var(--accent-cyan);
+  font-weight: var(--fw-semibold);
+}

@@ -1,0 +1,179 @@
+/* ============================================================
+   qasm.css — OpenQASM Editor Panel Styles
+   ============================================================
+   The right panel shows the live-generated OpenQASM code.
+   Users can also manually edit the QASM to update the circuit.
+   ============================================================ */
+
+/* ── QASM Editor Container ───────────────────────────────── */
+.qasm-editor-wrap {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ── QASM Toolbar ────────────────────────────────────────── */
+.qasm-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-panel);
+}
+
+.qasm-toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.qasm-toolbar-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.qasm-toolbar-btn.active {
+  color: var(--accent-cyan);
+  background: rgba(0, 212, 255, 0.1);
+}
+
+/* ── QASM Textarea ───────────────────────────────────────── */
+.qasm-textarea {
+  flex: 1;
+  width: 100%;
+  padding: var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-relaxed);
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: none;
+  resize: none;
+  outline: none;
+  tab-size: 2;
+}
+
+.qasm-textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* ── Line Numbers (optional overlay) ─────────────────────── */
+.qasm-line-numbers {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 36px;
+  padding: var(--sp-3) var(--sp-2);
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-relaxed);
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ── QASM Status Bar ─────────────────────────────────────── */
+.qasm-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-1) var(--sp-3);
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-panel);
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+.qasm-status .status-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+
+.qasm-status .status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.qasm-status .status-dot.valid {
+  background: var(--accent-green);
+}
+
+.qasm-status .status-dot.error {
+  background: var(--accent-red);
+}
+
+.qasm-status .status-dot.synced {
+  background: var(--accent-cyan);
+}
+
+/* ── Syntax Highlighting Classes (for future enhancement) ── */
+.qasm-keyword {
+  color: var(--accent-purple);
+  font-weight: var(--fw-semibold);
+}
+
+.qasm-gate {
+  color: var(--accent-cyan);
+}
+
+.qasm-register {
+  color: var(--accent-green);
+}
+
+.qasm-comment {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.qasm-number {
+  color: var(--accent-orange);
+}
+
+.qasm-string {
+  color: var(--accent-yellow);
+}
+
+/* ── QASM Error Highlight ────────────────────────────────── */
+.qasm-error-line {
+  background: rgba(255, 68, 102, 0.1);
+  border-left: 3px solid var(--accent-red);
+}
+
+/* ── Copy/Apply Feedback ─────────────────────────────────── */
+.qasm-copy-feedback {
+  position: absolute;
+  top: var(--sp-2);
+  right: var(--sp-2);
+  padding: var(--sp-1) var(--sp-3);
+  background: var(--accent-green);
+  color: #000;
+  border-radius: var(--radius-md);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: all var(--transition-fast);
+  pointer-events: none;
+}
+
+.qasm-copy-feedback.show {
+  opacity: 1;
+  transform: translateY(0);
+}

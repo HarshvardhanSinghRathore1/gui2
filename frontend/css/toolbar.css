@@ -1,0 +1,191 @@
+/* ============================================================
+   toolbar.css — Top Toolbar Styles
+   ============================================================
+   The toolbar sits at the very top and holds action buttons:
+   Run, Save, Load, Clear, Undo, Redo, Export QASM.
+   ============================================================ */
+
+/* ── Toolbar Container ───────────────────────────────────── */
+#toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-4);
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-color);
+  height: var(--toolbar-height);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+/* ── Logo / Brand ────────────────────────────────────────── */
+.toolbar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-right: var(--sp-4);
+  padding-right: var(--sp-4);
+  border-right: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.toolbar-brand-icon {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-md);
+  font-weight: var(--fw-bold);
+  color: #fff;
+  box-shadow: var(--shadow-glow-cyan);
+}
+
+.toolbar-brand-text {
+  font-size: var(--fs-base);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.toolbar-brand-text span {
+  color: var(--accent-cyan);
+}
+
+/* ── Button Group ────────────────────────────────────────── */
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+
+.toolbar-separator {
+  width: 1px;
+  height: 24px;
+  background: var(--border-color);
+  margin: 0 var(--sp-2);
+}
+
+/* ── Toolbar Button ──────────────────────────────────────── */
+.toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.toolbar-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+  border-color: var(--border-color);
+}
+
+.toolbar-btn:active {
+  transform: scale(0.96);
+  background: var(--bg-active);
+}
+
+.toolbar-btn .btn-icon {
+  font-size: var(--fs-md);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.toolbar-btn .btn-label {
+  display: inline-block;
+}
+
+/* ── Primary Button (Run) ────────────────────────────────── */
+.toolbar-btn.btn-primary {
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+  color: #fff;
+  font-weight: var(--fw-semibold);
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 212, 255, 0.25);
+}
+
+.toolbar-btn.btn-primary:hover {
+  box-shadow: 0 4px 16px rgba(0, 212, 255, 0.35);
+  transform: translateY(-1px);
+}
+
+.toolbar-btn.btn-primary:active {
+  transform: scale(0.96) translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 212, 255, 0.2);
+}
+
+/* ── Danger Button (Clear) ───────────────────────────────── */
+.toolbar-btn.btn-danger:hover {
+  color: var(--accent-red);
+  background: rgba(255, 68, 102, 0.1);
+  border-color: rgba(255, 68, 102, 0.3);
+}
+
+/* ── Disabled State ──────────────────────────────────────── */
+.toolbar-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Loading Spinner on Run Button ───────────────────────── */
+.toolbar-btn.is-loading .btn-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Status Indicator ────────────────────────────────────── */
+.toolbar-status {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+}
+
+.toolbar-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  box-shadow: 0 0 6px rgba(0, 221, 136, 0.5);
+}
+
+.toolbar-status-dot.disconnected {
+  background: var(--accent-red);
+  box-shadow: 0 0 6px rgba(255, 68, 102, 0.5);
+}
+
+/* ── Keyboard Shortcut Hints ─────────────────────────────── */
+.toolbar-btn .kbd {
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  background: var(--bg-primary);
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid var(--border-color);
+  font-family: var(--font-mono);
+  margin-left: var(--sp-1);
+}

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- ══════════════════════════════════════════════════════
+       Quantum Studio — 8-Qubit Circuit Editor
+       Inspired by IBM Quantum Composer
+       ══════════════════════════════════════════════════════ -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Quantum Studio — A professional 8-qubit quantum circuit editor with drag-and-drop gates, OpenQASM generation, and Qiskit simulation.">
+  <title>Quantum Studio — Quantum Circuit Editor</title>
+
+  <!-- ── Stylesheets ──────────────────────────────────────── -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/toolbar.css">
+  <link rel="stylesheet" href="css/gates.css">
+  <link rel="stylesheet" href="css/circuit.css">
+  <link rel="stylesheet" href="css/qasm.css">
+  <link rel="stylesheet" href="css/chart.css">
+
+  <!-- ── Chart.js CDN ─────────────────────────────────────── -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+  <!-- ══════════════════════════════════════════════════════
+       #app — Main Application Shell (CSS Grid)
+       ══════════════════════════════════════════════════════ -->
+  <div id="app">
+
+    <!-- ────────────────────────────────────────────────────
+         TOOLBAR — Top Action Bar
+         ──────────────────────────────────────────────────── -->
+    <header id="toolbar">
+      <!-- Brand -->
+      <div class="toolbar-brand">
+        <div class="toolbar-brand-icon">Q</div>
+        <div class="toolbar-brand-text">Quantum <span>Studio</span></div>
+      </div>
+
+      <!-- Primary Actions -->
+      <div class="toolbar-group">
+        <button id="btn-run" class="toolbar-btn btn-primary" title="Run simulation (Ctrl+Enter)">
+          <span class="btn-icon">▶</span>
+          <span class="btn-label">Run</span>
+        </button>
+      </div>
+
+      <div class="toolbar-separator"></div>
+
+      <!-- File Actions -->
+      <div class="toolbar-group">
+        <button id="btn-save" class="toolbar-btn" title="Save circuit (Ctrl+S)">
+          <span class="btn-icon">💾</span>
+          <span class="btn-label">Save</span>
+        </button>
+        <button id="btn-load" class="toolbar-btn" title="Load circuit (Ctrl+O)">
+          <span class="btn-icon">📂</span>
+          <span class="btn-label">Load</span>
+        </button>
+      </div>
+
+      <div class="toolbar-separator"></div>
+
+      <!-- Edit Actions -->
+      <div class="toolbar-group">
+        <button id="btn-undo" class="toolbar-btn" title="Undo (Ctrl+Z)" disabled>
+          <span class="btn-icon">↩</span>
+          <span class="btn-label">Undo</span>
+        </button>
+        <button id="btn-redo" class="toolbar-btn" title="Redo (Ctrl+Y)" disabled>
+          <span class="btn-icon">↪</span>
+          <span class="btn-label">Redo</span>
+        </button>
+        <button id="btn-clear" class="toolbar-btn btn-danger" title="Clear all gates">
+          <span class="btn-icon">🗑</span>
+          <span class="btn-label">Clear</span>
+        </button>
+      </div>
+
+      <div class="toolbar-separator"></div>
+
+      <!-- Export -->
+      <div class="toolbar-group">
+        <button id="btn-export" class="toolbar-btn" title="Export OpenQASM">
+          <span class="btn-icon">📄</span>
+          <span class="btn-label">Export QASM</span>
+        </button>
+      </div>
+
+      <!-- Status (right-aligned) -->
+      <div class="toolbar-status">
+        <span class="toolbar-status-dot" id="status-dot"></span>
+        <span id="status-text">Ready</span>
+      </div>
+    </header>
+
+    <!-- ────────────────────────────────────────────────────
+         SIDEBAR — Gate Palette
+         ──────────────────────────────────────────────────── -->
+    <aside id="sidebar">
+      <div class="panel-header">
+        <h2>Gates</h2>
+        <span class="panel-badge">8 Qubits</span>
+      </div>
+      <div class="panel-body" id="gate-palette">
+        <!-- Gate cards will be rendered by gatePalette.js -->
+      </div>
+    </aside>
+
+    <!-- ────────────────────────────────────────────────────
+         CIRCUIT EDITOR — Center Canvas
+         ──────────────────────────────────────────────────── -->
+    <main id="circuit-area">
+      <div class="circuit-container" id="circuit-container">
+        <!-- Qubit Labels -->
+        <div class="qubit-labels" id="qubit-labels">
+          <!-- Rendered by circuitRenderer.js -->
+        </div>
+
+        <!-- Circuit Grid -->
+        <div class="circuit-grid" id="circuit-grid">
+          <!-- Grid cells rendered by circuitRenderer.js -->
+        </div>
+
+        <!-- SVG Overlay for control lines -->
+        <svg class="circuit-svg-overlay" id="circuit-svg-overlay">
+          <!-- Control lines drawn by circuitRenderer.js -->
+        </svg>
+
+        <!-- Empty State Hint -->
+        <div class="circuit-empty-hint" id="circuit-empty-hint">
+          <div class="hint-icon">⚛️</div>
+          <div>Drag gates from the palette to build your circuit</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ────────────────────────────────────────────────────
+         QASM EDITOR — Right Panel
+         ──────────────────────────────────────────────────── -->
+    <section id="qasm-panel">
+      <div class="panel-header">
+        <h2>OpenQASM</h2>
+        <span class="panel-badge" id="qasm-version">2.0</span>
+      </div>
+      <div class="qasm-editor-wrap">
+        <div class="qasm-toolbar">
+          <button class="qasm-toolbar-btn" id="btn-copy-qasm" title="Copy to clipboard">
+            📋 Copy
+          </button>
+          <button class="qasm-toolbar-btn" id="btn-apply-qasm" title="Apply QASM to circuit">
+            ✅ Apply
+          </button>
+        </div>
+        <textarea
+          id="qasm-textarea"
+          class="qasm-textarea"
+          placeholder="OpenQASM code will appear here...&#10;&#10;You can also type or paste QASM code and click Apply."
+          spellcheck="false"
+        ></textarea>
+        <div class="qasm-status">
+          <div class="status-indicator">
+            <span class="status-dot synced" id="qasm-status-dot"></span>
+            <span id="qasm-status-text">Synced</span>
+          </div>
+          <span id="qasm-line-count">0 lines</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ────────────────────────────────────────────────────
+         CHART PANEL — Probability Distribution
+         ──────────────────────────────────────────────────── -->
+    <section id="chart-panel">
+      <div class="panel-header">
+        <h2>Probability Distribution</h2>
+        <span class="panel-badge" id="chart-shots-badge">1024 shots</span>
+      </div>
+      <div class="chart-container" id="chart-container">
+        <!-- Empty State -->
+        <div class="chart-empty" id="chart-empty">
+          <div class="chart-empty-icon">📊</div>
+          <div class="chart-empty-text">No simulation results yet</div>
+          <div class="chart-empty-hint">Click "Run" to simulate your circuit</div>
+        </div>
+
+        <!-- Chart Canvas (hidden until results) -->
+        <div class="chart-canvas-wrap" id="chart-canvas-wrap" style="display:none;">
+          <canvas id="probability-chart"></canvas>
+        </div>
+
+        <!-- Results Summary -->
+        <div class="chart-summary" id="chart-summary" style="display:none;">
+          <div class="chart-summary-title">Top States</div>
+          <div class="top-states-list" id="top-states-list">
+            <!-- Populated by probabilityChart.js -->
+          </div>
+          <div class="chart-shots-info" id="chart-shots-info"></div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+  <!-- end #app -->
+
+  <!-- ── Modal: Save Dialog ───────────────────────────────── -->
+  <div id="modal-save" class="modal-overlay" style="display:none;">
+    <div class="modal-content glass">
+      <h3>Save Circuit</h3>
+      <input type="text" id="save-name-input" placeholder="Circuit name..." />
+      <div class="modal-actions">
+        <button id="modal-save-confirm" class="toolbar-btn btn-primary">Save</button>
+        <button id="modal-save-cancel" class="toolbar-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Modal: Load Dialog ───────────────────────────────── -->
+  <div id="modal-load" class="modal-overlay" style="display:none;">
+    <div class="modal-content glass">
+      <h3>Load Circuit</h3>
+      <div id="load-circuit-list" class="load-list">
+        <!-- Populated dynamically -->
+      </div>
+      <div class="modal-actions">
+        <button id="modal-load-cancel" class="toolbar-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Modal: Parameter Input (for RX, RY, RZ, P) ──────── -->
+  <div id="modal-param" class="modal-overlay" style="display:none;">
+    <div class="modal-content glass">
+      <h3 id="param-modal-title">Enter Parameter</h3>
+      <p id="param-modal-desc" style="color:var(--text-secondary);font-size:var(--fs-sm);margin-bottom:var(--sp-3);">
+        Enter the rotation angle in radians (e.g., π/2 = 1.5708)
+      </p>
+      <input type="number" id="param-input" placeholder="Angle in radians..." step="0.01" />
+      <div class="modal-actions">
+        <button id="modal-param-confirm" class="toolbar-btn btn-primary">Apply</button>
+        <button id="modal-param-cancel" class="toolbar-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Modal Styles (inline for simplicity) ─────────────── -->
+  <style>
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: var(--z-modal);
+      animation: fadeIn 0.15s ease-out;
+    }
+    .modal-content {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: var(--sp-6);
+      min-width: 340px;
+      max-width: 480px;
+      box-shadow: var(--shadow-lg);
+      animation: slideUp 0.2s ease-out;
+    }
+    .modal-content h3 {
+      font-size: var(--fs-lg);
+      font-weight: var(--fw-semibold);
+      margin-bottom: var(--sp-4);
+      color: var(--text-primary);
+    }
+    .modal-content input {
+      width: 100%;
+      margin-bottom: var(--sp-4);
+    }
+    .modal-actions {
+      display: flex;
+      gap: var(--sp-2);
+      justify-content: flex-end;
+    }
+    .load-list {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: var(--sp-4);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+    }
+    .load-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--sp-3);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: background var(--transition-fast), border-color var(--transition-fast);
+    }
+    .load-item:hover {
+      background: var(--bg-hover);
+      border-color: var(--accent-cyan);
+    }
+    .load-item-name {
+      font-weight: var(--fw-medium);
+      color: var(--text-primary);
+    }
+    .load-item-date {
+      font-size: var(--fs-xs);
+      color: var(--text-muted);
+    }
+  </style>
+
+  <!-- ── JavaScript Modules ───────────────────────────────── -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

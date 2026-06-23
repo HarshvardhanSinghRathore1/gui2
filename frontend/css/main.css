@@ -1,0 +1,274 @@
+/* ============================================================
+   main.css — Design Tokens, Reset & Global Styles
+   ============================================================
+   This is the foundation of the Quantum Studio design system.
+   Every color, font, spacing value, and shadow is defined here
+   as a CSS custom property (variable) so the entire theme can
+   be changed from one place.
+   ============================================================ */
+
+/* ── Google Fonts ────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* ── CSS Custom Properties (Design Tokens) ──────────────── */
+:root {
+  /* ── Color Palette ─────────────────────────────────────── */
+  --bg-primary:       #0a0a14;
+  --bg-secondary:     #0f0f1e;
+  --bg-panel:         #141428;
+  --bg-surface:       #1a1a35;
+  --bg-hover:         #22224a;
+  --bg-active:        #2a2a5a;
+
+  --border-color:     #2a2a4a;
+  --border-light:     #3a3a6a;
+  --border-accent:    #00d4ff33;
+
+  --text-primary:     #e8e8f0;
+  --text-secondary:   #a0a0c0;
+  --text-muted:       #6a6a8a;
+  --text-accent:      #00d4ff;
+
+  /* ── Accent Colors ─────────────────────────────────────── */
+  --accent-cyan:      #00d4ff;
+  --accent-blue:      #4488ff;
+  --accent-purple:    #8855ff;
+  --accent-pink:      #ff44aa;
+  --accent-green:     #00dd88;
+  --accent-orange:    #ff8844;
+  --accent-red:       #ff4466;
+  --accent-yellow:    #ffcc00;
+
+  /* ── Gate Colors ───────────────────────────────────────── */
+  --gate-h:           #00d4ff;
+  --gate-x:           #ff4466;
+  --gate-y:           #ff44aa;
+  --gate-z:           #ff8844;
+  --gate-s:           #4488ff;
+  --gate-t:           #6644ee;
+  --gate-p:           #aa44ff;
+  --gate-rx:          #ff6644;
+  --gate-ry:          #ff44aa;
+  --gate-rz:          #ff8844;
+  --gate-cx:          #00dd88;
+  --gate-cy:          #00bb99;
+  --gate-cz:          #009988;
+  --gate-swap:        #8855ff;
+  --gate-measure:     #ffcc00;
+  --gate-reset:       #ff4466;
+  --gate-ccx:         #00dd88;
+  --gate-qft:         #8855ff;
+  --gate-iqft:        #aa55cc;
+
+  /* ── Typography ────────────────────────────────────────── */
+  --font-ui:          'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono:        'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+  --fs-xs:            0.6875rem;   /* 11px */
+  --fs-sm:            0.75rem;     /* 12px */
+  --fs-base:          0.875rem;    /* 14px */
+  --fs-md:            1rem;        /* 16px */
+  --fs-lg:            1.25rem;     /* 20px */
+  --fs-xl:            1.5rem;      /* 24px */
+  --fs-2xl:           2rem;        /* 32px */
+
+  --fw-light:         300;
+  --fw-regular:       400;
+  --fw-medium:        500;
+  --fw-semibold:      600;
+  --fw-bold:          700;
+
+  --lh-tight:         1.2;
+  --lh-normal:        1.5;
+  --lh-relaxed:       1.75;
+
+  /* ── Spacing ───────────────────────────────────────────── */
+  --sp-1:             0.25rem;     /* 4px */
+  --sp-2:             0.5rem;      /* 8px */
+  --sp-3:             0.75rem;     /* 12px */
+  --sp-4:             1rem;        /* 16px */
+  --sp-5:             1.25rem;     /* 20px */
+  --sp-6:             1.5rem;      /* 24px */
+  --sp-8:             2rem;        /* 32px */
+  --sp-10:            2.5rem;      /* 40px */
+  --sp-12:            3rem;        /* 48px */
+
+  /* ── Borders & Radii ───────────────────────────────────── */
+  --radius-sm:        4px;
+  --radius-md:        8px;
+  --radius-lg:        12px;
+  --radius-xl:        16px;
+  --radius-full:      9999px;
+
+  /* ── Shadows ───────────────────────────────────────────── */
+  --shadow-sm:        0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md:        0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg:        0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-glow-cyan: 0 0 20px rgba(0, 212, 255, 0.15);
+  --shadow-glow-blue: 0 0 20px rgba(68, 136, 255, 0.15);
+
+  /* ── Glassmorphism ─────────────────────────────────────── */
+  --glass-bg:         rgba(20, 20, 40, 0.7);
+  --glass-border:     rgba(255, 255, 255, 0.06);
+  --glass-blur:       12px;
+
+  /* ── Transitions ───────────────────────────────────────── */
+  --ease-out:         cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:      cubic-bezier(0.65, 0, 0.35, 1);
+  --transition-fast:  150ms var(--ease-out);
+  --transition-base:  250ms var(--ease-out);
+  --transition-slow:  400ms var(--ease-out);
+
+  /* ── Layout Dimensions ─────────────────────────────────── */
+  --toolbar-height:   52px;
+  --sidebar-width:    220px;
+  --qasm-panel-width: 300px;
+  --chart-height:     220px;
+
+  /* ── Z-index Scale ─────────────────────────────────────── */
+  --z-base:           1;
+  --z-panel:          10;
+  --z-toolbar:        100;
+  --z-drag:           1000;
+  --z-modal:          2000;
+  --z-tooltip:        3000;
+}
+
+/* ── Reset ───────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-ui);
+  font-size: var(--fs-base);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-normal);
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  overflow: hidden;            /* the app fills the viewport */
+  height: 100vh;
+  width: 100vw;
+}
+
+a {
+  color: var(--accent-cyan);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font-family: var(--font-ui);
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+}
+
+input, textarea, select {
+  font-family: var(--font-ui);
+  font-size: var(--fs-base);
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--sp-2) var(--sp-3);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: var(--shadow-glow-cyan);
+}
+
+textarea {
+  font-family: var(--font-mono);
+  resize: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-light);
+}
+
+/* ── Utility Classes ─────────────────────────────────────── */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+}
+
+/* ── Selection Color ─────────────────────────────────────── */
+::selection {
+  background: rgba(0, 212, 255, 0.3);
+  color: var(--text-primary);
+}
+
+/* ── Animations ──────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.6; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}

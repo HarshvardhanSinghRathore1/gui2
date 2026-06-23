@@ -1,0 +1,152 @@
+/* ============================================================
+   layout.css — Application Layout (CSS Grid)
+   ============================================================
+   Defines the 5-region layout:
+     ┌─────────── TOOLBAR ────────────┐
+     │ SIDEBAR │  CIRCUIT  │  QASM    │
+     │         │  EDITOR   │  EDITOR  │
+     ├─────────┴───────────┴──────────┤
+     │       PROBABILITY CHART        │
+     └────────────────────────────────┘
+   ============================================================ */
+
+/* ── App Shell ───────────────────────────────────────────── */
+#app {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr var(--qasm-panel-width);
+  grid-template-rows: var(--toolbar-height) 1fr var(--chart-height);
+  grid-template-areas:
+    "toolbar   toolbar   toolbar"
+    "sidebar   circuit   qasm"
+    "chart     chart     chart";
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+/* ── Toolbar Region ──────────────────────────────────────── */
+#toolbar {
+  grid-area: toolbar;
+  z-index: var(--z-toolbar);
+}
+
+/* ── Sidebar Region ──────────────────────────────────────── */
+#sidebar {
+  grid-area: sidebar;
+  overflow-y: auto;
+  border-right: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  z-index: var(--z-panel);
+}
+
+/* ── Circuit Region ──────────────────────────────────────── */
+#circuit-area {
+  grid-area: circuit;
+  overflow: auto;             /* infinite scroll both axes */
+  position: relative;
+  background: var(--bg-primary);
+  /* subtle dot grid background */
+  background-image:
+    radial-gradient(circle, var(--border-color) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* ── QASM Editor Region ─────────────────────────────────── */
+#qasm-panel {
+  grid-area: qasm;
+  overflow-y: auto;
+  border-left: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  z-index: var(--z-panel);
+}
+
+/* ── Chart Region ────────────────────────────────────────── */
+#chart-panel {
+  grid-area: chart;
+  overflow: hidden;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  z-index: var(--z-panel);
+}
+
+/* ── Panel Headers ───────────────────────────────────────── */
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-panel);
+  min-height: 40px;
+}
+
+.panel-header h2 {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.panel-header .panel-badge {
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  color: var(--accent-cyan);
+  background: rgba(0, 212, 255, 0.1);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+/* ── Panel Body ──────────────────────────────────────────── */
+.panel-body {
+  padding: var(--sp-3);
+  height: calc(100% - 40px);
+  overflow-y: auto;
+}
+
+/* ── Resize Handles (future enhancement) ─────────────────── */
+.resize-handle {
+  position: absolute;
+  background: transparent;
+  z-index: var(--z-panel);
+  transition: background var(--transition-fast);
+}
+.resize-handle:hover {
+  background: var(--accent-cyan);
+}
+.resize-handle.horizontal {
+  width: 3px;
+  height: 100%;
+  cursor: col-resize;
+  top: 0;
+}
+.resize-handle.vertical {
+  height: 3px;
+  width: 100%;
+  cursor: row-resize;
+  left: 0;
+}
+
+/* ── Responsive Adjustments ──────────────────────────────── */
+@media (max-width: 1200px) {
+  #app {
+    grid-template-columns: 180px 1fr 260px;
+  }
+}
+
+@media (max-width: 900px) {
+  #app {
+    grid-template-columns: 160px 1fr;
+    grid-template-rows: var(--toolbar-height) 1fr 200px 180px;
+    grid-template-areas:
+      "toolbar   toolbar"
+      "sidebar   circuit"
+      "qasm      qasm"
+      "chart     chart";
+  }
+  #qasm-panel {
+    border-left: none;
+    border-top: 1px solid var(--border-color);
+  }
+}
