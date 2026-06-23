@@ -1,1338 +1,1253 @@
-# ⚛ Quantum Studio — Complete Beginner's Guide & Course
+# ⚛ Quantum Studio — Comprehensive Web Development & Quantum Engineering Textbook
 
-> **An 8-qubit quantum circuit editor inspired by IBM Quantum Composer.**
-> Build professional quantum circuits with drag-and-drop, simulate them with Qiskit, and learn quantum computing along the way.
+Welcome to the **Quantum Studio Complete Curriculum and Textbook**. This document is designed to take you from a basic programmer to a professional frontend architect, backend developer, and quantum software engineer. 
 
----
-
-## Table of Contents
-
-1. [Introduction](#1-introduction)
-2. [Prerequisites & Quick Start](#2-prerequisites--quick-start)
-3. [Project Structure](#3-project-structure)
-4. [Technology Primer](#4-technology-primer)
-   - [What is HTML?](#what-is-html)
-   - [What is CSS?](#what-is-css)
-   - [What is JavaScript?](#what-is-javascript)
-   - [What is FastAPI?](#what-is-fastapi)
-   - [What is Qiskit?](#what-is-qiskit)
-   - [What is OpenQASM?](#what-is-openqasm)
-5. [Frontend Foundations](#5-frontend-foundations)
-   - [HTML Deep Dive](#html-deep-dive)
-   - [CSS Deep Dive](#css-deep-dive)
-   - [JavaScript Deep Dive](#javascript-deep-dive)
-6. [Component Deep-Dives](#6-component-deep-dives)
-   - [index.html](#indexhtml)
-   - [main.css](#maincss)
-   - [toolbar.js](#toolbarjs)
-   - [gatePalette.js](#gatepalettejs)
-   - [circuitRenderer.js](#circuitrendererjs)
-   - [gatePlacement.js](#gateplacementjs)
-   - [qasmGenerator.js](#qasmgeneratorjs)
-   - [qasmParser.js](#qasmparserjs)
-   - [probabilityChart.js](#probabilitychartjs)
-   - [backendAPI.js](#backendapijs)
-7. [Circuit Model Explained](#7-circuit-model-explained)
-8. [Non-Adjacent Controlled Gates](#8-non-adjacent-controlled-gates)
-9. [QASM Generator Flow](#9-qasm-generator-flow)
-10. [QASM Parser Flow](#10-qasm-parser-flow)
-11. [Backend Deep-Dive](#11-backend-deep-dive)
-12. [Database Schema](#12-database-schema)
-13. [Qiskit Integration](#13-qiskit-integration)
-14. [Development Roadmap](#14-development-roadmap)
-15. [Glossary](#15-glossary)
+Through this textbook, we will build a professional-grade, browser-based quantum circuit editor from scratch.
 
 ---
 
-## 1. Introduction
+# PART 1: The Foundations of the Web
 
-**Quantum Studio** is a browser-based quantum circuit editor that lets you:
+## 1. What is a Webpage?
+A webpage is a structured document delivered by a server to a client (usually a web browser) over the internet. At its core, it is a text document that references other resources (like stylesheets, script files, and images).
+The browser parses this text document and renders a visual interface that users can interact with.
 
-- **Drag and drop** quantum gates onto an 8-qubit circuit
-- **Visualize** non-adjacent controlled gates with connection lines
-- **Generate OpenQASM** code in real-time as you build circuits
-- **Parse OpenQASM** code back into visual circuits
-- **Simulate** circuits using IBM's Qiskit framework
-- **See probability distributions** of quantum measurement outcomes
-- **Save and load** circuits for later use
-
-### Why This Project?
-
-Learning quantum computing is hard. Learning web development is also hard. This project teaches you **both** at the same time by building something real and useful. Every line of code is documented. Every concept is explained.
-
-### What Does "Inspired by IBM Quantum Composer" Mean?
-
-IBM Quantum Composer is a professional tool used by researchers and students to build quantum circuits visually. Our Quantum Studio has the same core features:
-
-- Horizontal qubit wires
-- Drag-and-drop gate placement
-- Real-time QASM generation
-- Simulation results visualization
-
----
-
-## 2. Prerequisites & Quick Start
-
-### What You Need
-
-- **A web browser** (Chrome, Firefox, Edge — any modern browser)
-- **Python 3.10+** (for the backend and Qiskit)
-- **A text editor** (VS Code recommended)
-
-### Quick Start
-
-```bash
-# 1. Clone or download the project
-cd quantum-studio
-
-# 2. Start the frontend (any simple HTTP server)
-cd frontend
-python -m http.server 3000
-# Open http://localhost:3000
-
-# 3. In a new terminal, start the backend
-cd backend
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
-# API docs at http://localhost:8000/docs
+## 2. How a Webpage Loads in a Browser
+When you type a URL into a browser, the following process occurs:
+```
+1. DNS Resolution: Browser requests the IP address of the server from DNS.
+2. TCP Handshake: Browser establishes a connection with the server.
+3. HTTP Request: Browser requests the file (e.g., index.html).
+4. HTTP Response: Server sends back index.html.
+5. DOM Construction: Browser parses HTML and builds the DOM tree.
+6. CSSOM Construction: Browser parses CSS and builds the CSSOM tree.
+7. Render Tree: DOM + CSSOM are combined.
+8. Layout: Browser calculates sizes and positions of elements.
+9. Paint: Browser draws pixels on the screen.
 ```
 
-> **Note:** The frontend works even without the backend! It runs in "offline mode" with mock simulation results. The backend adds real Qiskit simulation and database storage.
+## 3. How HTML, CSS, and JavaScript Work Together
+- **HTML (HyperText Markup Language)** provides the **structure** and raw elements.
+- **CSS (Cascading Style Sheets)** provides the **presentation** and layout rules.
+- **JavaScript (JS)** provides the **behavior** and logic.
 
 ---
 
-## 3. Project Structure
+# PART 2: HTML Section (From Zero to Hero)
 
-```
-quantum-studio/
-│
-├── README.md                    ← You are here
-│
-├── frontend/                    ← Everything the browser loads
-│   │
-│   ├── index.html               ← The single HTML page
-│   │
-│   ├── css/                     ← All stylesheets
-│   │   ├── main.css             ← Design tokens, reset, theme
-│   │   ├── layout.css           ← CSS Grid layout
-│   │   ├── toolbar.css          ← Top toolbar styles
-│   │   ├── gates.css            ← Gate palette cards
-│   │   ├── circuit.css          ← Circuit grid and wires
-│   │   ├── qasm.css             ← QASM editor panel
-│   │   └── chart.css            ← Probability chart
-│   │
-│   └── js/                      ← All JavaScript modules
-│       ├── app.js               ← Entry point (bootstraps everything)
-│       │
-│       ├── models/
-│       │   └── circuitModel.js  ← THE HEART — gate data storage
-│       │
-│       ├── circuit/
-│       │   ├── circuitRenderer.js ← Renders model to DOM
-│       │   ├── gatePlacement.js   ← Drag-and-drop logic
-│       │   ├── qasmGenerator.js   ← Model → QASM text
-│       │   └── qasmParser.js      ← QASM text → Model
-│       │
-│       ├── ui/
-│       │   ├── toolbar.js         ← Button handlers
-│       │   ├── gatePalette.js     ← Sidebar gate cards
-│       │   ├── qasmEditor.js      ← Right panel QASM editor
-│       │   └── probabilityChart.js← Chart.js integration
-│       │
-│       └── api/
-│           └── backendAPI.js      ← Fetch wrappers for FastAPI
-│
-└── backend/                     ← Python server
-    ├── main.py                  ← FastAPI app & endpoints
-    ├── simulator.py             ← Qiskit simulation
-    ├── database.py              ← SQLite operations
-    ├── qasm_parser.py           ← Server-side QASM parser
-    ├── qasm_generator.py        ← Server-side QASM generator
-    ├── models.py                ← SQL table definitions
-    ├── schemas.py               ← Pydantic validation models
-    └── requirements.txt         ← Python dependencies
-```
+For each HTML element below, we break down:
+1. **What is it?**
+2. **Why do we need it?**
+3. **What problem does it solve?**
+4. **How does it work internally?**
+5. **Small beginner example.**
+6. **How it is used in Quantum Studio.**
+7. **Common mistakes.**
+8. **Best practices.**
 
 ---
 
-## 4. Technology Primer
+### `<html>`
+*   **What is it?** The root container of the HTML document.
+*   **Why do we need it?** It marks the beginning and end of the document.
+*   **What problem does it solve?** It tells the parser that this is an HTML document.
+*   **Internal Working:** The browser engine parses this tag first to instantiate the root HTMLHtmlElement DOM node.
+*   **Example:** `<html></html>`
+*   **Quantum Studio usage:** Wraps the entire `index.html` file.
+*   **Common mistake:** Forgetting the `<DOCTYPE html>` declaration or omitting the language attribute `lang="en"`.
+*   **Best practice:** Always declare `<html lang="en">` for search engines and screen readers.
 
-### What is HTML?
+### `<head>`
+*   **What is it?** A metadata container.
+*   **Why do we need it?** To specify character encodings, stylesheets, and scripts.
+*   **What problem does it solve?** Separates settings and setup from the actual visible contents.
+*   **Internal Working:** The browser processes items in the head before rendering the body.
+*   **Example:** `<head><title>Test</title></head>`
+*   **Quantum Studio usage:** Contains all stylesheet link tags and CDN script imports.
+*   **Common mistake:** Placing visible content (like paragraphs or divs) inside the head.
+*   **Best practice:** Keep script tags at the bottom of the body or load them with `defer` or `type="module"`.
 
-**HTML** (HyperText Markup Language) is the skeleton of every web page. It defines the **structure** — what elements exist on the page.
+### `<body>`
+*   **What is it?** The visible content container.
+*   **Why do we need it?** To wrap all user-facing UI elements.
+*   **What problem does it solve?** Tells the browser what must be rendered on the page canvas.
+*   **Internal Working:** Triggers the generation of the render tree nodes.
+*   **Example:** `<body><h1>Hello World</h1></body>`
+*   **Quantum Studio usage:** Contains the `#app` layout grid wrapper.
+*   **Common mistake:** Adding more than one body tag to a page.
+*   **Best practice:** Maintain proper semantic structure inside the body.
 
+### `<div>`
+*   **What is it?** A generic block-level container.
+*   **Why do we need it?** For grouping elements together for styling or script interactions.
+*   **What problem does it solve?** Helps divide the page into distinct boxes.
+*   **Internal Working:** Standard block element with zero default styling.
+*   **Example:** `<div><p>Text</p></div>`
+*   **Quantum Studio usage:** Used extensively to form cells in the circuit grid.
+*   **Common mistake:** "Divitis" — using divs for everything instead of semantic elements like `<header>`.
+*   **Best practice:** Use divs ONLY when no semantic tag fits the purpose.
+
+### `<button>`
+*   **What is it?** A clickable interface control.
+*   **Why do we need it?** To capture user clicks and trigger logic.
+*   **What problem does it solve?** Standardizes keyboard accessibility and focus management.
+*   **Internal Working:** Fires click events when clicked or when the Space/Enter keys are pressed.
+*   **Example:** `<button>Click Me</button>`
+*   **Quantum Studio usage:** Used for toolbar buttons (Run, Save, Load, Clear).
+*   **Common mistake:** Using a styled `div` instead of a `button` for actions.
+*   **Best practice:** Always specify `type="button"` to prevent it from submitting forms.
+
+### `<input>`
+*   **What is it?** A data entry field.
+*   **Why do we need it?** To accept text or numeric parameters from the user.
+*   **What problem does it solve?** Allows interactive inputs.
+*   **Internal Working:** Captures keystrokes and updates the `value` property in the DOM.
+*   **Example:** `<input type="number" id="val" />`
+*   **Quantum Studio usage:** Parameter modal for RX, RY, RZ rotation angles.
+*   **Common mistake:** Not specifying labels or placeholder attributes.
+*   **Best practice:** Always associate inputs with a label for accessibility.
+
+### `<textarea>`
+*   **What is it?** A multi-line text input field.
+*   **Why do we need it?** To display and edit raw OpenQASM source code blocks.
+*   **What problem does it solve?** Standard text inputs are only single-line.
+*   **Internal Working:** Manages a large block of text with scroll support.
+*   **Example:** `<textarea>OPENQASM 2.0;</textarea>`
+*   **Quantum Studio usage:** Displays the generated QASM code.
+*   **Common mistake:** Forgetting to disable native browser spelling check (`spellcheck="false"`).
+*   **Best practice:** Set `spellcheck="false"` when displaying source code.
+
+### `<span>`
+*   **What is it?** An inline container for text.
+*   **Why do we need it?** To style specific parts of a text sentence.
+*   **What problem does it solve?** Allows styling inside a paragraph without breaking lines.
+*   **Internal Working:** Inline element with zero padding or margin defaults.
+*   **Example:** `<p>Hello <span style="color:red">World</span></p>`
+*   **Quantum Studio usage:** Brand text styling (`Quantum <span>Studio</span>`).
+*   **Common mistake:** Using span as a block element.
+*   **Best practice:** Use only for inline decoration or small inline indicators.
+
+### `<section>`
+*   **What is it?** A semantic container representing a section of a page.
+*   **Why do we need it?** To divide the document into logical sections.
+*   **What problem does it solve?** Improves document semantics.
+*   **Internal Working:** Block level element parsed as a document outline node.
+*   **Example:** `<section><h2>Help</h2></section>`
+*   **Quantum Studio usage:** Wraps the QASM panel and Chart panel.
+*   **Common mistake:** Using it for styling purposes instead of semantic outlining.
+*   **Best practice:** Every section should contain a heading tag (`<h2>`-`<h6>`).
+
+### `<header>`
+*   **What is it?** A semantic wrapper for introductory content.
+*   **Why do we need it?** To structure headings and navigations.
+*   **What problem does it solve?** Marks structural headers.
+*   **Internal Working:** Block layout, parsed as outline header.
+*   **Example:** `<header><h1>Main Menu</h1></header>`
+*   **Quantum Studio usage:** The toolbar is styled inside a `<header id="toolbar">` tag.
+*   **Common mistake:** Nesting a header inside another header.
+*   **Best practice:** Use it at the top of structural blocks.
+
+### `<footer>`
+*   **What is it?** A footer container for pages or sections.
+*   **Why do we need it?** To store copyright or metadata links.
+*   **What problem does it solve?** Semantic structural classification.
+*   **Internal Working:** Standard block element at the end of sections.
+*   **Example:** `<footer>Copyright 2026</footer>`
+*   **Quantum Studio usage:** Holds author and license info.
+*   **Common mistake:** Placing main navigation menus inside standard footers.
+*   **Best practice:** Keep footer links concise.
+
+### `<main>`
+*   **What is it?** A wrapper for the primary content.
+*   **Why do we need it?** To separate unique content from repeating elements like sidebars.
+*   **What problem does it solve?** Identifies core page content for assistive technologies.
+*   **Internal Working:** Unique block container.
+*   **Example:** `<main><p>Core Content</p></main>`
+*   **Quantum Studio usage:** Wraps the circuit editor canvas.
+*   **Common mistake:** Using more than one `<main>` tag on a single document.
+*   **Best practice:** Always use exactly one `<main>` tag per page.
+
+### `<nav>`
+*   **What is it?** A navigation link container.
+*   **Why do we need it?** To group menu paths.
+*   **What problem does it solve?** Accessibility tools can quickly skip or read navigation routes.
+*   **Internal Working:** Structural block element.
+*   **Example:** `<nav><a href="/">Home</a></nav>`
+*   **Quantum Studio usage:** Toolbar sub-navigation groups.
+*   **Common mistake:** Wrapping non-navigation lists in `<nav>`.
+*   **Best practice:** Wrap only major site navigations.
+
+---
+
+## 4. HTML Layout & Relationships
+
+### Parent-Child Relationships
+Elements nested inside other elements are "children" of those elements. The nesting defines hierarchical scopes. For example:
 ```html
-<!-- This is an HTML element -->
-<button id="btn-run" class="toolbar-btn">
-  Run
-</button>
-```
-
-Key concepts:
-- **Elements** are defined by tags: `<div>`, `<button>`, `<input>`
-- **Attributes** give elements metadata: `id="btn-run"`, `class="toolbar-btn"`
-- **Nesting** creates parent-child relationships
-- The browser reads HTML top-to-bottom and builds a tree (the DOM)
-
-### What is CSS?
-
-**CSS** (Cascading Style Sheets) makes HTML look beautiful. It controls **colors, sizes, fonts, layouts, and animations**.
-
-```css
-/* This CSS rule styles all elements with class "toolbar-btn" */
-.toolbar-btn {
-  background: linear-gradient(135deg, #00d4ff, #4488ff);
-  color: white;
-  padding: 8px 12px;
-  border-radius: 8px;
-  transition: transform 0.15s ease;
-}
-
-.toolbar-btn:hover {
-  transform: translateY(-1px);  /* lifts up slightly on hover */
-}
-```
-
-Key concepts:
-- **Selectors** target elements: `.class`, `#id`, `element`
-- **Properties** change appearance: `color`, `background`, `padding`
-- **Flexbox** and **Grid** control layout
-- **Transitions** and **animations** add motion
-
-### What is JavaScript?
-
-**JavaScript** makes web pages interactive. It handles **user input, data manipulation, and dynamic updates**.
-
-```javascript
-// When user clicks "Run", simulate the circuit
-document.getElementById('btn-run').addEventListener('click', () => {
-  const qasm = qasmGenerator.generate(model);
-  backendAPI.runCircuit(qasm).then(result => {
-    chart.updateResults(result.counts);
-  });
-});
-```
-
-Key concepts:
-- **Variables** store data: `let`, `const`
-- **Functions** are reusable blocks of code
-- **Objects** group related data: `{ type: "H", target: 0 }`
-- **Arrays** are ordered lists: `[gate1, gate2, gate3]`
-- **Events** respond to user actions: clicks, drags, key presses
-- **Modules** split code into files: `import`, `export`
-
-### What is FastAPI?
-
-**FastAPI** is a Python web framework for building APIs (Application Programming Interfaces).
-
-```python
-from fastapi import FastAPI
-
-app = FastAPI()
-
-@app.post("/run")
-async def run_simulation(request: RunRequest):
-    result = simulate_circuit(request.qasm, request.shots)
-    return result
-```
-
-Key concepts:
-- **Endpoints** are URL paths that accept requests: `/run`, `/save`
-- **HTTP methods** define the action: `GET` (read), `POST` (create)
-- **Request bodies** contain data from the frontend (JSON)
-- **Response bodies** contain data sent back (JSON)
-- **Pydantic** validates incoming data automatically
-
-### What is Qiskit?
-
-**Qiskit** is IBM's open-source quantum computing SDK for Python.
-
-```python
-from qiskit import QuantumCircuit
-
-# Create a 2-qubit circuit
-qc = QuantumCircuit(2, 2)
-
-# Apply gates
-qc.h(0)        # Hadamard on qubit 0 → creates superposition
-qc.cx(0, 1)    # CNOT: control=0, target=1 → creates entanglement
-
-# Measure
-qc.measure([0, 1], [0, 1])
-
-# This creates a Bell state: |00⟩ + |11⟩ (50/50)
-```
-
-Key concepts:
-- **QuantumCircuit** — The circuit object
-- **Gates** — Operations on qubits (H, X, CX, etc.)
-- **Measure** — Collapses quantum state to classical bits
-- **AerSimulator** — Simulates circuits on your CPU
-- **Counts** — How many times each outcome occurred
-
-### What is OpenQASM?
-
-**OpenQASM** (Open Quantum Assembly Language) is a text format for describing quantum circuits. It's like Assembly language for quantum computers.
-
-```
-OPENQASM 2.0;
-include "qelib1.inc";
-
-qreg q[8];    // 8 quantum bits
-creg c[8];    // 8 classical bits
-
-h q[0];       // Hadamard on qubit 0
-cx q[0],q[7]; // CNOT: control q0, target q7
-measure q[0] -> c[0];  // Measure qubit 0
-measure q[7] -> c[7];  // Measure qubit 7
-```
-
-Key concepts:
-- **OPENQASM 2.0** — Version declaration
-- **qreg** — Quantum register (declares qubits)
-- **creg** — Classical register (stores measurement results)
-- **Gate instructions** — `h q[0];`, `cx q[0],q[7];`
-- **measure** — Reads a qubit's state into a classical bit
-
----
-
-## 5. Frontend Foundations
-
-### HTML Deep Dive
-
-#### Elements Used in Quantum Studio
-
-| Element | Purpose | Example |
-|---------|---------|---------|
-| `<div>` | Generic container | `<div class="gate-card">` |
-| `<button>` | Clickable action | `<button id="btn-run">Run</button>` |
-| `<input>` | Text input | `<input type="text" id="save-name">` |
-| `<textarea>` | Multi-line text | `<textarea id="qasm-textarea">` |
-| `<header>` | Top section | `<header id="toolbar">` |
-| `<aside>` | Side panel | `<aside id="sidebar">` |
-| `<main>` | Primary content | `<main id="circuit-area">` |
-| `<section>` | Content group | `<section id="qasm-panel">` |
-| `<canvas>` | Drawing area | `<canvas id="probability-chart">` |
-| `<svg>` | Vector graphics | `<svg class="circuit-svg-overlay">` |
-
-#### Layout Structure
-
-```html
-<div id="app">
-  <!--
-    The #app div uses CSS Grid to create 5 regions:
-    
-    ┌──────────── TOOLBAR ─────────────┐
-    │ SIDEBAR │   CIRCUIT   │   QASM   │
-    │         │   EDITOR    │   EDITOR  │
-    ├─────────┴─────────────┴──────────┤
-    │        PROBABILITY CHART         │
-    └──────────────────────────────────┘
-  -->
-  <header id="toolbar">...</header>
-  <aside id="sidebar">...</aside>
-  <main id="circuit-area">...</main>
-  <section id="qasm-panel">...</section>
-  <section id="chart-panel">...</section>
+<div class="parent">
+  <button class="child">Run</button>
 </div>
 ```
+Here, the `parent` wraps the `child`. Styling properties (like font-family) cascade down from the parent.
 
-### CSS Deep Dive
+### The DOM Tree
+DOM stands for **Document Object Model**. The browser transforms HTML text into a tree of JavaScript objects.
+```
+         Document
+            │
+          <html>
+        ┌───┴───┐
+     <head>   <body>
+                │
+              <div> (app)
+        ┌───────┼───────┐
+    <header> <aside>  <main>
+```
 
-#### CSS Custom Properties (Variables)
+### Visual Hierarchy
+Visual hierarchy organizes content visually using font size, weights, margins, and contrast to guide the user's eye from the most critical elements to supporting details.
 
-We define ALL design values in one place so changing the theme requires editing only `main.css`:
+---
 
-```css
-:root {
-  --bg-primary:    #0a0a14;     /* darkest background */
-  --accent-cyan:   #00d4ff;     /* primary accent color */
-  --font-ui:       'Inter', sans-serif;
-  --radius-md:     8px;         /* standard border radius */
-  --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
-}
+# PART 3: CSS Section (Layout Architecture)
 
-/* Used like this: */
-.toolbar-btn {
-  background: var(--bg-surface);     /* reads from the variable */
-  border-radius: var(--radius-md);
-  transition: background var(--transition-fast);
+For each CSS property and selector type below, we break down:
+1. **What is it?**
+2. **Why do we need it?**
+3. **Visual behavior (with diagrams).**
+4. **Common mistakes.**
+5. **Quantum Studio usage.**
+
+---
+
+### CSS Selectors
+*   **What is it?** Patterns used to match and target elements for styling.
+*   **Why do we need it?** To isolate style rules to specific elements.
+*   **Visual Representation:**
+    - Element selector: `button {}` targets all buttons.
+    - Class selector: `.btn-primary {}` targets elements with the class attribute.
+    - ID selector: `#toolbar {}` targets the unique element with the matching ID.
+*   **Common mistake:** Using excessively long selector paths like `div > header > div > button`.
+*   **Quantum Studio usage:** `.gate-card` styles individual gate options in the sidebar.
+
+### CSS Box Model
+*   **What is it?** The box structure wrapped around every element.
+*   **Why do we need it?** To compute layout dimensions.
+*   **Visual Diagram:**
+```
+ ┌──────────────────────────────────────────┐
+ │                 MARGIN                   │  <- Outside space (separates boxes)
+ │  ┌────────────────────────────────────┐  │
+ │  │              BORDER                │  │  <- Line wrapping content
+ │  │  ┌──────────────────────────────┐  │  │
+ │  │  │           PADDING            │  │  │  <- Inside space (breathing room)
+ │  │  │  ┌────────────────────────┐  │  │  │
+ │  │  │  │        CONTENT         │  │  │  │  <- The actual elements/text
+ │  │  │  └────────────────────────┘  │  │  │
+ │  │  └──────────────────────────────┘  │  │
+ │  └────────────────────────────────────┘  │
+ └──────────────────────────────────────────┘
+```
+*   **Common mistake:** Forgetting to set `box-sizing: border-box`, which causes padding and borders to expand elements beyond their configured widths.
+*   **Quantum Studio usage:** Standardizing box sizing globally in `main.css`.
+
+### Margin, Padding, and Border
+*   **What is it?** Spacing layers of the CSS Box Model.
+*   **Why do we need it?**
+    - Padding gives content breathing room inside a card.
+    - Border highlights structural divisions.
+    - Margin positions elements relative to neighbors.
+*   **Common mistake:** Applying margins instead of paddings, leading to broken click hit-boxes on buttons.
+*   **Quantum Studio usage:** Padding on the `.panel-body` container.
+
+### Display
+*   **What is it?** Controls how elements render inside their parents.
+*   **Why do we need it?** To switch elements between block, inline, flex, grid, or hidden.
+*   **Common mistake:** Forgetting that inline elements ignore top/bottom margins and widths.
+*   **Quantum Studio usage:** `display: grid` on `#app` layouts.
+
+### Flexbox (Flexible Box Layout)
+*   **What is it?** A 1D layout model for arranging items in rows or columns.
+*   **Why do we need it?** To distribute space and align items along axes.
+*   **Visual Axis:**
+```
+     Main Axis (horizontal by default)
+     ┌───────────────────────────────────┐
+     │  [Item 1]    [Item 2]    [Item 3] │
+     └───────────────────────────────────┘
+```
+*   **Common mistake:** Confusing `justify-content` (aligns along the main axis) with `align-items` (aligns along the cross axis).
+*   **Quantum Studio usage:** `#toolbar` uses `display: flex; align-items: center` to align items.
+
+### CSS Grid
+*   **What is it?** A 2D grid-based layout framework.
+*   **Why do we need it?** To build complex, multi-row, multi-column web structures.
+*   **Visual Grid:**
+```
+     Column 1   Column 2   Column 3
+     ┌──────────┬──────────┬──────────┐
+Row 1│ Header   │ Header   │ Header   │
+     ├──────────┼──────────┼──────────┤
+Row 2│ Sidebar  │ Circuit  │ QASM     │
+     └──────────┴──────────┴──────────┘
+```
+*   **Common mistake:** Over-nesting grids when flexbox would be simpler.
+*   **Quantum Studio usage:** Laying out the 8 horizontal wires and time columns.
+
+### CSS Positions (Relative, Absolute, Fixed, Sticky)
+*   **What is it?** Controls positioning rules of elements.
+*   **Why do we need it?**
+    - `relative`: Positions elements relative to their normal flow location.
+    - `absolute`: Positions elements relative to their nearest positioned ancestor.
+    - `fixed`: Positions elements relative to the viewport.
+    - `sticky`: Toggles relative/fixed positioning on scroll.
+*   **Common mistake:** Forgetting to add `position: relative` to the parent container when using `position: absolute` on children.
+*   **Quantum Studio usage:** `.circuit-svg-overlay` is absolute-positioned over the grid.
+
+---
+
+# PART 4: JavaScript Section (Logic & Architecture)
+
+Here, we explore the engine under the hood.
+
+---
+
+### Variables (`const` vs `let`)
+*   **Explanation:** `const` defines block-scoped values that cannot be reassigned. `let` defines block-scoped variables that can be modified.
+*   **Internal Working:** They exist inside lexical environments, preventing hoisting variables to global scopes like the deprecated `var` did.
+*   **Example:**
+```javascript
+const maxQubits = 8;
+let currentColumn = 0;
+```
+*   **Quantum Studio usage:** Initializing configurations.
+
+### Functions
+*   **Explanation:** Reusable statements containing blocks of code.
+*   **Internal Working:** Functions create Execution Contexts on the Call Stack when executed.
+*   **Example:**
+```javascript
+const add = (a, b) => a + b;
+```
+
+### Arrays & Methods
+*   **Explanation:** Ordered lists of values supporting map, filter, and reduce operations.
+*   **Internal Working:** Fast index lookups.
+*   **Example:**
+```javascript
+const list = [0, 1, 2];
+const doubled = list.map(n => n * 2);
+```
+*   **Quantum Studio usage:** `this.gates` is an array of objects manipulated by `addGate()` and `removeGate()`.
+
+### Objects
+*   **Explanation:** Key-value collections representing structured entities.
+*   **Example:**
+```javascript
+const gate = { type: 'H', target: 0 };
+```
+
+### Classes
+*   **Explanation:** Blueprint templates for creating object structures.
+*   **Internal Working:** Syntactic sugar over JavaScript's prototype-based inheritance.
+*   **Example:**
+```javascript
+class Qubit {
+  constructor(index) { this.index = index; }
 }
 ```
 
-#### Flexbox
+### ES Modules
+*   **Explanation:** Native mechanism to split code blocks into files using `import` and `export`.
+*   **Internal Working:** Evaluated in structural dependency graphs before loading.
+*   **Example:**
+```javascript
+export class CircuitModel {}
+import { CircuitModel } from './models/circuitModel.js';
+```
 
-Flexbox arranges items in a row or column:
+### DOM Manipulation
+*   **Explanation:** Logic updates to structural page nodes dynamically.
+*   **Internal Working:** Triggers browser layouts and paint passes.
+*   **Example:**
+```javascript
+document.getElementById('title').textContent = 'Quantum';
+```
 
-```css
-/* The toolbar uses flexbox to lay out buttons horizontally */
-#toolbar {
-  display: flex;          /* enable flexbox */
-  align-items: center;    /* vertically center children */
-  gap: 8px;               /* space between children */
+### Events & Handlers
+*   **Explanation:** Signal emitters notifying actions like clicks and drags.
+*   **Internal Working:** Captured via browser event-loop task queues.
+*   **Example:**
+```javascript
+button.addEventListener('click', e => runSim());
+```
+
+### Local Storage
+*   **Explanation:** Key-value browser storage engine persisting across refreshes.
+*   **Example:**
+```javascript
+localStorage.setItem('circuit', JSON.stringify(data));
+```
+
+### Fetch API & Async/Await
+*   **Explanation:** Web API facilitating asynchronous HTTP requests.
+*   **Internal Working:** Executes on microtask queues using Promises.
+*   **Example:**
+```javascript
+async function runAPI() {
+  const res = await fetch('/run', { method: 'POST' });
+  return await res.json();
 }
 ```
 
-#### CSS Grid
+---
 
-Grid creates 2D layouts:
+# PART 5: Step-by-Step Curriculum (Lessons 1-14)
+
+---
+
+## Lesson 1: Create `index.html`
+
+### File Design
+*   **Why this file exists:** Entry point of the web UI.
+*   **Responsibility:** Define core structural regions and load styles.
+*   **Inputs:** None (initial browser loads).
+*   **Outputs:** HTML Document Object Model.
+*   **Dependencies:** `css/main.css`, `js/app.js`, `chart.js` CDN.
+
+### Annotated Source Code
+We will write the complete visual structure of the layout regions:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Quantum Studio — A professional 8-qubit quantum circuit editor.">
+  <title>Quantum Studio — Quantum Circuit Editor</title>
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/toolbar.css">
+  <link rel="stylesheet" href="css/gates.css">
+  <link rel="stylesheet" href="css/circuit.css">
+  <link rel="stylesheet" href="css/qasm.css">
+  <link rel="stylesheet" href="css/chart.css">
+
+  <!-- Chart.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <!-- TOOLBAR -->
+    <header id="toolbar">
+      <div class="toolbar-brand">
+        <div class="toolbar-brand-icon">Q</div>
+        <div class="toolbar-brand-text">Quantum <span>Studio</span></div>
+      </div>
+      <div class="toolbar-group">
+        <button id="btn-run" class="toolbar-btn btn-primary" title="Run simulation">
+          <span class="btn-icon">▶</span>
+          <span class="btn-label">Run</span>
+        </button>
+      </div>
+      <div class="toolbar-separator"></div>
+      <div class="toolbar-group">
+        <button id="btn-save" class="toolbar-btn">💾 Save</button>
+        <button id="btn-load" class="toolbar-btn">📂 Load</button>
+      </div>
+      <div class="toolbar-status">
+        <span class="toolbar-status-dot" id="status-dot"></span>
+        <span id="status-text">Ready</span>
+      </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar">
+      <div class="panel-header"><h2>Gates</h2></div>
+      <div class="panel-body" id="gate-palette"></div>
+    </aside>
+
+    <!-- CIRCUIT -->
+    <main id="circuit-area">
+      <div class="circuit-container" id="circuit-container">
+        <div class="qubit-labels" id="qubit-labels"></div>
+        <div class="circuit-grid" id="circuit-grid"></div>
+        <svg class="circuit-svg-overlay" id="circuit-svg-overlay"></svg>
+        <div class="circuit-empty-hint" id="circuit-empty-hint">⚛️ Drag gates here</div>
+      </div>
+    </main>
+
+    <!-- QASM PANEL -->
+    <section id="qasm-panel">
+      <div class="panel-header"><h2>OpenQASM</h2></div>
+      <textarea id="qasm-textarea" spellcheck="false"></textarea>
+    </section>
+
+    <!-- CHART PANEL -->
+    <section id="chart-panel">
+      <div class="panel-header"><h2>Simulation Results</h2></div>
+      <div class="chart-container">
+        <canvas id="probability-chart"></canvas>
+      </div>
+    </section>
+  </div>
+
+  <!-- Bootstrapping Script -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
+```
+
+### Line-by-Line Code Explanation
+*   `Line 1`: Declares the document type as HTML5.
+*   `Line 2`: Sets English as the webpage language.
+*   `Line 3-7`: Document metadata and configurations.
+*   `Line 8-14`: Links structural and component styles.
+*   `Line 17`: Loads Chart.js for data visualization.
+*   `Line 20`: Div layout entry wrapper container.
+*   `Line 21-39`: Navigation button actions and statuses.
+*   `Line 42-45`: Sidebar component containing available gates.
+*   `Line 48-55`: Primary circuit container, drawing lines and holding gates.
+*   `Line 58-61`: Text editor for handling generated source code.
+*   `Line 64-69`: Panel displaying final counts distributions.
+*   `Line 72`: Imports modular logic execution scripts.
+
+---
+
+## Lesson 2: Create Application Layout (`layout.css` & `main.css`)
+
+### File Design
+*   **Why this file exists:** Establishes color themes, resets defaults, and specifies the 5-region Grid layout.
+*   **Responsibility:** Design layout responsive regions and set CSS variables.
+*   **Inputs:** None (parsed by browser).
+*   **Outputs:** Visual layouts.
+*   **Dependencies:** None.
+
+### Annotated Source Code
+Here is the core layouts stylesheet `layout.css`:
 
 ```css
-/* The app shell uses Grid for the 5-region layout */
 #app {
   display: grid;
-  grid-template-columns: 220px 1fr 300px;
-  grid-template-rows: 52px 1fr 220px;
+  grid-template-columns: 240px 1fr 320px;
+  grid-template-rows: 56px 1fr 240px;
   grid-template-areas:
     "toolbar  toolbar  toolbar"
     "sidebar  circuit  qasm"
     "chart    chart    chart";
   height: 100vh;
+  width: 100vw;
+  background-color: #0d0e15;
+  color: #f1f1f1;
 }
 
-/* Each child claims a named area */
-#toolbar      { grid-area: toolbar; }
-#sidebar      { grid-area: sidebar; }
-#circuit-area { grid-area: circuit; }
-#qasm-panel   { grid-area: qasm; }
-#chart-panel  { grid-area: chart; }
+#toolbar {
+  grid-area: toolbar;
+  background-color: #12131c;
+  border-bottom: 1px solid #232533;
+}
+
+#sidebar {
+  grid-area: sidebar;
+  background-color: #12131c;
+  border-right: 1px solid #232533;
+}
+
+#circuit-area {
+  grid-area: circuit;
+  overflow: auto;
+  position: relative;
+}
+
+#qasm-panel {
+  grid-area: qasm;
+  background-color: #12131c;
+  border-left: 1px solid #232533;
+}
+
+#chart-panel {
+  grid-area: chart;
+  background-color: #12131c;
+  border-top: 1px solid #232533;
+}
 ```
 
-#### Positioning
+### Line-by-Line Code Explanation
+*   `Line 1-9`: Configures grid positions mapping columns and rows.
+*   `Line 10-13`: Sets full height/width constraints.
+*   `Line 15-19`: Maps the header component to the top grid area.
+*   `Line 21-25`: Pins the sidebar selector to the left-aligned grid block.
+*   `Line 27-31`: Defines the central workspace grid position, setting scrolling rules.
+*   `Line 33-37`: Positions the code editor wrapper area.
+*   `Line 39-43`: Positions the bottom measurement output distribution dashboard.
+
+---
+
+## Lesson 3: Create Toolbar (`toolbar.js` & `toolbar.css`)
+
+### File Design
+*   **Why this file exists:** Implements the button logic on the top actions panel.
+*   **Responsibility:** Hook up run, save, load, and clear buttons to event listeners.
+*   **Inputs:** User mouse click actions.
+*   **Outputs:** Invokes backend calculations and triggers model resets.
+*   **Dependencies:** `backendAPI.js`, `circuitModel.js`.
+
+### Annotated Source Code
+We implement `toolbar.js`:
+
+```javascript
+export class Toolbar {
+  constructor(model, qasmGenerator, backendAPI, chart) {
+    this.model = model;
+    this.qasmGenerator = qasmGenerator;
+    this.backendAPI = backendAPI;
+    this.chart = chart;
+    this.setupListeners();
+  }
+
+  setupListeners() {
+    document.getElementById('btn-run').addEventListener('click', () => this.runSimulation());
+    document.getElementById('btn-clear').addEventListener('click', () => this.clearCircuit());
+  }
+
+  async runSimulation() {
+    const qasm = this.qasmGenerator.generate(this.model);
+    try {
+      const res = await this.backendAPI.runCircuit(qasm);
+      this.chart.updateResults(res.counts);
+    } catch (e) {
+      console.warn("Backend offline, using mocks", e);
+      this.chart.updateMockResults();
+    }
+  }
+
+  clearCircuit() {
+    if (confirm("Reset current circuit?")) {
+      this.model.clearAll();
+    }
+  }
+}
+```
+
+### Line-by-Line Code Explanation
+*   `Line 1-7`: Instantiates references to core models, generators, APIs, and charts.
+*   `Line 9-12`: Hooks event listeners to buttons using element selectors.
+*   `Line 14-23`: Converts current model structures to QASM text, makes network fetch calls, and updates probabilities.
+*   `Line 25-29`: Calls clean algorithms in the model if confirmed.
+
+---
+
+## Lesson 4: Create Gate Palette (`gatePalette.js` & `gates.css`)
+
+### File Design
+*   **Why this file exists:** Renders draggable gates (H, X, CNOT) on the sidebar panel.
+*   **Responsibility:** Display gate options and mark them as drag sources.
+*   **Inputs:** `GATE_DEFS` definitions map metadata.
+*   **Outputs:** HTML draggable elements populated into the DOM.
+*   **Dependencies:** `circuitModel.js` metadata definitions.
+
+### Annotated Source Code
+We define `gatePalette.js`:
+
+```javascript
+import { GATE_DEFS } from '../models/circuitModel.js';
+
+export class GatePalette {
+  constructor(placementEngine) {
+    this.placement = placementEngine;
+    this.render();
+  }
+
+  render() {
+    const container = document.getElementById('gate-palette');
+    container.innerHTML = '';
+    
+    for (const [type, def] of Object.entries(GATE_DEFS)) {
+      const card = document.createElement('div');
+      card.className = 'gate-card';
+      card.draggable = true;
+      card.dataset.type = type;
+      card.innerHTML = `<span class="gate-label">${def.label}</span>`;
+      
+      card.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', type);
+      });
+      
+      container.appendChild(card);
+    }
+  }
+}
+```
+
+### Line-by-Line Code Explanation
+*   `Line 1`: Imports metadata definitions from the data model layer.
+*   `Line 3-7`: Instantiates the palette UI renderer.
+*   `Line 9-11`: Resets HTML content inside the sidebar.
+*   `Line 13-18`: Iteratively generates drag cards.
+*   `Line 20-22`: Implements dragstart handlers, storing target gate types in dataTransfer objects.
+*   `Line 24-25`: Appends created cards to the DOM.
+
+---
+
+## Lesson 5: Create Qubit Wires (`circuit.css`)
+
+### File Design
+*   **Why this file exists:** Visualizes the horizontal lines (wires) representing qubits.
+*   **Responsibility:** Render horizontal grid segments and wires.
+*   **Inputs:** None (CSS declarations).
+*   **Outputs:** Styling layout lines.
+
+### Annotated Source Code
+Here is `circuit.css`:
 
 ```css
-/* The SVG overlay is positioned absolutely over the grid */
-.circuit-svg-overlay {
-  position: absolute;  /* removed from normal flow */
-  top: 0;
+.circuit-container {
+  position: relative;
+  padding: 24px;
+  background-color: #0d0e15;
+}
+
+.circuit-grid {
+  display: grid;
+  grid-template-rows: repeat(8, 64px);
+  position: relative;
+}
+
+.circuit-row-wire {
+  position: absolute;
   left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none; /* clicks pass through to grid cells */
+  right: 0;
+  height: 2px;
+  background-color: #232533;
+  top: 31px;
+  z-index: 1;
 }
 ```
 
-### JavaScript Deep Dive
+### Line-by-Line Code Explanation
+*   `Line 1-5`: Configures main container constraints.
+*   `Line 7-10`: Implements grid layout for 8 rows of qubits (64px height each).
+*   `Line 12-20`: Positions absolute lines acting as qubit wires behind the gates.
 
-#### Variables
+---
 
-```javascript
-// const — value cannot be reassigned (use for most things)
-const NUM_QUBITS = 8;
-const model = new CircuitModel();
+## Lesson 6: Create Circuit Model (`circuitModel.js`)
 
-// let — value can be reassigned (use when value changes)
-let selectedGateId = null;
-selectedGateId = "gate_123";
+### File Design
+*   **Why this file exists:** Single source of truth containing all circuit data.
+*   **Responsibility:** Store gates, manage snapshots, and implement undo/redo functions.
+*   **Inputs:** Calls from placement handler operations.
+*   **Outputs:** Returns sorted arrays of active gates.
 
-// AVOID var — it has confusing scoping rules
-```
-
-#### Arrays
-
-```javascript
-// Arrays store ordered lists of items
-const targets = [0, 7];        // qubit indices
-const gates = [];               // empty array
-
-// Add items
-gates.push({ type: "H", target: 0 });
-
-// Remove items
-gates.splice(index, 1);         // remove 1 item at index
-
-// Find items
-const found = gates.find(g => g.id === "gate_123");
-
-// Filter items
-const columnGates = gates.filter(g => g.column === 5);
-
-// Sort items
-const sorted = gates.sort((a, b) => a.column - b.column);
-
-// Check if item exists
-const exists = targets.includes(7);  // true
-```
-
-#### Objects
+### Annotated Source Code
+We write the code:
 
 ```javascript
-// Objects group related data with named keys
-const gate = {
-  id: "gate_1687456789_0",   // unique identifier
-  type: "CX",                 // gate type
-  controls: [0],              // control qubit(s)
-  targets: [7],               // target qubit(s)
-  column: 5,                  // time-step
-  params: {},                 // parameters (empty for CX)
-};
-
-// Access values
-console.log(gate.type);        // "CX"
-console.log(gate.targets[0]);  // 7
-
-// Modify values
-gate.column = 6;
-
-// Spread operator (shallow copy)
-const copy = { ...gate, column: 10 };
-```
-
-#### Classes
-
-```javascript
-// Classes are blueprints for creating objects
-class CircuitModel {
+export class CircuitModel {
   constructor() {
-    this.gates = [];        // instance property
-    this.numQubits = 8;
+    this.gates = [];
+    this.undoStack = [];
+    this.redoStack = [];
   }
 
-  addGate(gateData) {      // instance method
-    this.gates.push(gateData);
+  addGate(gateData) {
+    this.saveSnapshot();
+    const newGate = {
+      id: `gate_${Date.now()}_${Math.random()}`,
+      type: gateData.type,
+      controls: gateData.controls || [],
+      targets: gateData.targets || [],
+      column: gateData.column
+    };
+    this.gates.push(newGate);
+    this.emitChange();
+    return newGate;
   }
 
-  getGateCount() {
-    return this.gates.length;
+  saveSnapshot() {
+    this.undoStack.push(JSON.stringify(this.gates));
+    this.redoStack = [];
+  }
+
+  clearAll() {
+    this.saveSnapshot();
+    this.gates = [];
+    this.emitChange();
+  }
+
+  emitChange() {
+    document.dispatchEvent(new CustomEvent('circuit-changed'));
   }
 }
-
-// Create an instance
-const model = new CircuitModel();
-model.addGate({ type: "H", targets: [0], column: 0 });
-console.log(model.getGateCount());  // 1
 ```
 
-#### Functions
+### Line-by-Line Code Explanation
+*   `Line 1-6`: Instantiates model data arrays and stacks.
+*   `Line 8-19`: Creates gate objects with unique IDs and appends them to the internal array.
+*   `Line 21-24`: Deep-copies states into the undo stack and clears redo trackers.
+*   `Line 26-30`: Empties the current circuit list.
+*   `Line 32-34`: Dispatches custom browser events.
+
+---
+
+## Lesson 7: Render Gates (`circuitRenderer.js`)
+
+### File Design
+*   **Why this file exists:** Draws gates and connection lines onto the circuit panel.
+*   **Responsibility:** Draw SVG connection lines and position HTML gate boxes.
+*   **Inputs:** State of the `CircuitModel`.
+*   **Outputs:** Generated UI DOM elements.
+*   **Dependencies:** `circuitModel.js`.
+
+### Annotated Source Code
+We define `circuitRenderer.js`:
 
 ```javascript
-// Arrow functions (preferred for short operations)
-const add = (a, b) => a + b;
-
-// Regular functions (needed when using 'this')
-function handleClick(event) {
-  console.log(event.target.id);
-}
-
-// Async functions (for API calls)
-async function runSimulation() {
-  const response = await fetch('/run', { method: 'POST' });
-  const data = await response.json();
-  return data;
-}
-```
-
-#### Modules (Import/Export)
-
-```javascript
-// circuitModel.js — EXPORTS
-export class CircuitModel { ... }
-export const GATE_DEFS = { ... };
-
-// app.js — IMPORTS
-import { CircuitModel, GATE_DEFS } from './models/circuitModel.js';
-
-// To use modules, the script tag needs type="module":
-// <script type="module" src="js/app.js"></script>
-```
-
-#### Events
-
-```javascript
-// DOM Events — respond to user actions
-
-// Click event
-button.addEventListener('click', () => {
-  console.log('Button clicked!');
-});
-
-// Drag events (used for gate placement)
-card.addEventListener('dragstart', (e) => {
-  e.dataTransfer.setData('text/plain', 'H');
-});
-
-cell.addEventListener('drop', (e) => {
-  const gateType = e.dataTransfer.getData('text/plain');
-  model.addGate({ type: gateType, targets: [row], column: col });
-});
-
-// Custom events (used for model → view communication)
-const target = new EventTarget();
-target.dispatchEvent(new CustomEvent('circuit-changed', { detail: { action: 'add' } }));
-target.addEventListener('circuit-changed', (e) => {
-  renderer.render();
-});
-```
-
----
-
-## 6. Component Deep-Dives
-
-### index.html
-
-**Purpose:** The single HTML page that defines the entire application structure.
-
-**Responsibilities:**
-- Define the 5-region layout (toolbar, sidebar, circuit, QASM, chart)
-- Load all CSS stylesheets
-- Load Chart.js from CDN
-- Load the main JavaScript entry point
-- Define modal dialogs (save, load, parameter input)
-
-**Key Sections:**
-1. `<header id="toolbar">` — Action buttons (Run, Save, Load, etc.)
-2. `<aside id="sidebar">` — Gate palette container
-3. `<main id="circuit-area">` — Circuit grid and SVG overlay
-4. `<section id="qasm-panel">` — QASM textarea and controls
-5. `<section id="chart-panel">` — Chart.js canvas and summary
-
-**Data Flow:** Static structure → CSS styles it → JavaScript populates it dynamically.
-
----
-
-### main.css
-
-**Purpose:** The design system foundation. Every color, font, spacing value, and shadow is defined here as CSS custom properties.
-
-**Responsibilities:**
-- Import Google Fonts (Inter for UI, JetBrains Mono for code)
-- Define 60+ CSS custom properties (design tokens)
-- CSS reset (normalize browser defaults)
-- Global styles (body, links, buttons, inputs)
-- Custom scrollbar styling
-- Utility classes (`.visually-hidden`, `.glass`)
-- Keyframe animations (`fadeIn`, `slideUp`, `pulse`)
-
-**Why Custom Properties?**
-Changing `--accent-cyan: #00d4ff` to `--accent-cyan: #ff4466` instantly recolors the ENTIRE application. This is the power of a design system.
-
----
-
-### toolbar.js
-
-**Purpose:** Wires up all toolbar button click handlers and keyboard shortcuts.
-
-**Responsibilities:**
-- Run → Calls `backendAPI.runCircuit()` → Updates chart
-- Save → Shows modal → Calls `backendAPI.saveCircuit()` or localStorage
-- Load → Shows modal → Lists circuits → Calls `model.fromJSON()`
-- Clear → Confirms → Calls `model.clearAll()`
-- Undo/Redo → Calls `model.undo()` / `model.redo()`
-- Export → Generates QASM → Downloads as `.qasm` file
-- Keyboard: Ctrl+Enter, Ctrl+S, Ctrl+Z, Ctrl+Y
-
-**Data Flow:**
-```
-Button Click → toolbar handler
-  → model.clearAll() (for Clear)
-  → backendAPI.runCircuit(qasm) → chart.updateResults() (for Run)
-  → qasmGenerator.generate(model) → download file (for Export)
-```
-
-**Functions:**
-| Function | What It Does |
-|----------|-------------|
-| `runSimulation()` | Generates QASM, calls backend, updates chart |
-| `saveCircuit()` | Shows save modal, saves to backend/localStorage |
-| `loadCircuit()` | Shows load modal, loads circuit data into model |
-| `exportQASM()` | Generates QASM, creates downloadable file |
-| `_updateButtonStates()` | Enables/disables undo/redo buttons |
-| `_generateMockResults()` | Creates fake results when backend is offline |
-
----
-
-### gatePalette.js
-
-**Purpose:** Renders the gate card sidebar and makes cards draggable.
-
-**Responsibilities:**
-- Render gate cards grouped by category
-- Display gate icon (letter) and label
-- Show tooltip with gate description on hover
-- Make each card a drag source
-
-**Categories:**
-1. **Single Qubit:** H, X, Y, Z, S, S†, T, T†, P
-2. **Rotation:** RX, RY, RZ
-3. **Controlled:** CX, CY, CZ
-4. **Special:** SWAP, Measure, Reset
-5. **Advanced:** CCX, QFT, IQFT
-
-**Data Flow:**
-```
-GATE_DEFS (static) → gatePalette.render() → DOM cards
-  → GatePlacement.setupDragSource() on each card
-  → Card is now draggable
-```
-
----
-
-### circuitRenderer.js
-
-**Purpose:** Reads the CircuitModel and renders the circuit as DOM elements.
-
-**Responsibilities:**
-- Create the grid of cells (8 rows × N columns)
-- Render qubit labels (q0–q7)
-- Place gate elements on occupied cells
-- Draw SVG lines for non-adjacent controlled gates
-- Show/hide the empty-state hint
-- Handle gate click (select) and right-click (delete)
-
-**Data Flow:**
-```
-CircuitModel "circuit-changed" event
-  → renderer.render()
-  → _renderGrid()     — creates empty cells
-  → _renderGates()    — places gate elements on cells
-  → _renderControlLines() — draws SVG for CX/CY/CZ/CCX
-  → _updateEmptyHint()
-```
-
-**Functions:**
-| Function | What It Does |
-|----------|-------------|
-| `render()` | Full re-render of the circuit |
-| `_renderGrid()` | Creates NxM grid of empty cells |
-| `_renderGates()` | Places gate elements on cells |
-| `_renderControlLines()` | Draws SVG lines for controlled gates |
-| `_onGateClick()` | Select or delete a gate |
-| `_formatAngle()` | Shows π/2 instead of 1.5708 |
-
----
-
-### gatePlacement.js
-
-**Purpose:** Handles the entire drag-and-drop workflow for placing gates.
-
-**Responsibilities:**
-- Set up drag events on palette cards
-- Set up drop zone events on grid cells
-- Validate drop positions (no overlapping)
-- Multi-step placement for controlled gates
-- Parameter input for rotation gates (RX, RY, RZ, P)
-
-**How Multi-Step Placement Works:**
-
-For a CX (CNOT) gate:
-1. User drops CX on qubit 0 → "Click target qubit for CX"
-2. User clicks qubit 7 → Gate created: `{ controls: [0], targets: [7] }`
-
-For a CCX (Toffoli) gate:
-1. User drops CCX on qubit 0 → "Click second control for CCX"
-2. User clicks qubit 1 → "Click target qubit for CCX"
-3. User clicks qubit 2 → Gate created: `{ controls: [0,1], targets: [2] }`
-
-**Data Flow:**
-```
-dragstart on palette card → dragover on grid cell (highlight)
-  → drop on grid cell → _handleDrop()
-    → Single gate: model.addGate() immediately
-    → Controlled gate: set _pendingPlacement, wait for click
-    → Parameterized gate: show modal, then model.addGate()
-```
-
----
-
-### qasmGenerator.js
-
-**Purpose:** Converts the CircuitModel's gates into OpenQASM 2.0 text.
-
-**Responsibilities:**
-- Generate QASM header (version, include)
-- Declare registers (qreg, creg)
-- Convert each gate to a QASM instruction
-- Sort by column order
-
-**Conversion Examples:**
-
-```
-GUI Action          → Model Object                          → QASM Output
-─────────────────────────────────────────────────────────────────────────
-Drop H on q0       → {type:"H", targets:[0]}               → h q[0];
-Drop CX: q0→q7     → {type:"CX", controls:[0], targets:[7]}→ cx q[0],q[7];
-Drop RX(π/2) on q2 → {type:"RX", targets:[2], params:{θ:1.57}} → rx(1.5708) q[2];
-Drop CCX: q0,q1→q2 → {type:"CCX", controls:[0,1], targets:[2]} → ccx q[0],q[1],q[2];
-SWAP q2↔q5          → {type:"SWAP", targets:[2,5]}          → swap q[2],q[5];
-Measure q0         → {type:"MEASURE", targets:[0]}         → measure q[0] -> c[0];
-```
-
----
-
-### qasmParser.js
-
-**Purpose:** Parses OpenQASM 2.0 text back into gate objects for the model.
-
-**Responsibilities:**
-- Parse QASM header (version check)
-- Parse register declarations
-- Parse gate instructions using regex
-- Assign column numbers automatically
-- Report errors
-
-**Parse Examples:**
-
-```
-QASM Input              → Gate Object
-──────────────────────────────────────────
-h q[0];                 → {type:"H", targets:[0], column:0}
-cx q[0],q[7];           → {type:"CX", controls:[0], targets:[7], column:1}
-rx(1.5708) q[2];        → {type:"RX", targets:[2], params:{theta:1.5708}}
-measure q[0] -> c[0];   → {type:"MEASURE", targets:[0]}
-```
-
-**Column Assignment Algorithm:**
-Gates are assigned to the earliest column where none of their qubits are already used. This prevents visual overlaps.
-
----
-
-### probabilityChart.js
-
-**Purpose:** Displays simulation results as a Chart.js bar chart.
-
-**Responsibilities:**
-- Create/update Chart.js bar chart
-- Calculate probabilities from raw counts
-- Generate gradient bar colors (cyan → purple)
-- Show top-5 states in the sidebar
-- Handle empty state (no results yet)
-
-**Data Flow:**
-```
-Backend returns: { counts: {"00000000": 520, "10000001": 504}, shots: 1024 }
-  → chart.updateResults(counts, 1024)
-  → Probabilities: {"00000000": 0.508, "10000001": 0.492}
-  → Chart.js renders bars
-  → Top states list shows most likely outcomes
-```
-
----
-
-### backendAPI.js
-
-**Purpose:** Provides clean `fetch()` wrappers for all FastAPI endpoints.
-
-**Responsibilities:**
-- `runCircuit(qasm, shots)` → POST /run
-- `saveCircuit(name, qasm, model)` → POST /save
-- `loadCircuit(id)` → GET /load/:id
-- `listCircuits()` → GET /circuits
-- `generateQASM(model)` → POST /generate-qasm
-- `parseQASM(qasm)` → POST /parse-qasm
-- `isHealthy()` → GET /health
-
-**Error Handling:**
-If the backend is not running, the API throws a descriptive error. The toolbar catches this and falls back to offline mode (mock results + localStorage).
-
----
-
-## 7. Circuit Model Explained
-
-The CircuitModel is the **heart** of the entire application. It's the single source of truth for the circuit's state. Every other module either reads from it or writes to it.
-
-### Gate Object Structure
-
-```javascript
-{
-  id:       "gate_1687456789_0",   // unique identifier
-  type:     "CX",                   // gate type string
-  controls: [0],                    // control qubit indices
-  targets:  [7],                    // target qubit indices
-  column:   5,                      // time-step position
-  params:   {}                      // gate parameters
+export class CircuitRenderer {
+  constructor(model) {
+    this.model = model;
+    document.addEventListener('circuit-changed', () => this.draw());
+  }
+
+  draw() {
+    const grid = document.getElementById('circuit-grid');
+    grid.innerHTML = '';
+    
+    // Create empty cells
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 12; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'grid-cell';
+        cell.dataset.row = r;
+        cell.dataset.col = c;
+        grid.appendChild(cell);
+      }
+    }
+
+    // Place gates
+    for (const gate of this.model.gates) {
+      const targetCol = gate.column;
+      for (const targetRow of gate.targets) {
+        const cell = grid.querySelector(`[data-row="${targetRow}"][data-col="${targetCol}"]`);
+        if (cell) {
+          const el = document.createElement('div');
+          el.className = 'placed-gate';
+          el.textContent = gate.type;
+          cell.appendChild(el);
+        }
+      }
+    }
+  }
 }
 ```
 
-### Field-by-Field Explanation
-
-#### `id` — Unique Identifier
-- **What:** A unique string like `"gate_1687456789_3"`
-- **Why:** So we can identify, select, move, and delete individual gates
-- **How:** Generated from timestamp + counter: `gate_${Date.now()}_${counter++}`
-- **Used by:** Renderer (to create DOM elements), toolbar (to delete selected gate)
-
-#### `type` — Gate Type
-- **What:** Uppercase string matching QASM instruction
-- **Why:** Determines the gate's behavior, color, and QASM output
-- **Values:** `"H"`, `"X"`, `"Y"`, `"Z"`, `"S"`, `"SDG"`, `"T"`, `"TDG"`, `"P"`, `"RX"`, `"RY"`, `"RZ"`, `"CX"`, `"CY"`, `"CZ"`, `"SWAP"`, `"MEASURE"`, `"RESET"`, `"CCX"`, `"QFT"`, `"IQFT"`
-- **Used by:** Renderer (to choose color), QASM generator (to choose instruction name)
-
-#### `controls` — Control Qubit Indices
-- **What:** Array of qubit indices that act as controls
-- **Why:** Controlled gates (CX, CY, CZ, CCX) need to know which qubits are controls
-- **Values:**
-  - `[]` for single-qubit gates (H, X, Y, Z, etc.)
-  - `[0]` for CX with control on q0
-  - `[0, 1]` for CCX with controls on q0 and q1
-- **Used by:** Renderer (to draw control dots and vertical lines), QASM generator (to output `cx q[0],q[7];`)
-
-#### `targets` — Target Qubit Indices
-- **What:** Array of qubit indices that the gate acts on
-- **Why:** Every gate must act on at least one qubit
-- **Values:**
-  - `[3]` for H on q3
-  - `[7]` for CX target on q7
-  - `[2, 5]` for SWAP between q2 and q5
-- **Used by:** Renderer (to place gate box), QASM generator (to output qubit arguments)
-
-#### `column` — Time-Step Position
-- **What:** 0-indexed column number in the circuit grid
-- **Why:** Gates in quantum circuits are ordered by time. Column 0 happens first.
-- **Used by:** Renderer (CSS grid column placement), QASM generator (sorts gates by column)
-
-#### `params` — Gate Parameters
-- **What:** Object holding numerical parameters
-- **Why:** Rotation gates (RX, RY, RZ) and the phase gate (P) need an angle
-- **Values:**
-  - `{}` for most gates
-  - `{ theta: 1.5708 }` for RX(π/2)
-  - `{ theta: 3.14159 }` for RZ(π)
-- **Used by:** Renderer (displays angle), QASM generator (outputs `rx(1.5708) q[0];`)
-
-### Why Is the Model the Heart?
-
-```
-┌──────────────┐
-│ Gate Palette  │ ─── drops gate ───→ ┌───────────────┐
-└──────────────┘                       │               │
-                                       │  Circuit      │
-┌──────────────┐                       │  Model        │
-│ QASM Parser  │ ─── sets gates ───→  │               │
-└──────────────┘                       │  gates = []   │
-                                       │               │
-┌──────────────┐                       │               │
-│ Load Circuit │ ─── fromJSON() ───→  │               │
-└──────────────┘                       └───────┬───────┘
-                                               │
-                              "circuit-changed" event
-                                               │
-              ┌────────────────┬───────────────┼────────────────┐
-              ▼                ▼               ▼                ▼
-    ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌────────┐
-    │  Renderer    │  │ QASM Editor  │  │ QASM Gen     │  │ Undo/  │
-    │  (re-draw)   │  │ (update text)│  │ (gen QASM)   │  │ Redo   │
-    └──────────────┘  └──────────────┘  └──────────────┘  └────────┘
-```
-
-Everything flows through the model. This pattern is called "single source of truth."
+### Line-by-Line Code Explanation
+*   `Line 1-5`: Configures listeners monitoring updates on data models.
+*   `Line 7-9`: Resets active grid configurations.
+*   `Line 11-20`: Renders empty grid cell blocks.
+*   `Line 22-33`: Matches coordinates to place text-labeled visual boxes representing gates.
 
 ---
 
-## 8. Non-Adjacent Controlled Gates
+## Lesson 8: Add Drag-and-Drop (`gatePlacement.js`)
 
-### The Challenge
+### File Design
+*   **Why this file exists:** Connects user drags and mouse drops to model updates.
+*   **Responsibility:** Validate placement zones and fire placement callbacks.
+*   **Inputs:** Browser drag-and-drop operations.
+*   **Outputs:** Calls `model.addGate()` to modify state.
+*   **Dependencies:** `circuitModel.js`, `circuitRenderer.js`.
 
-A CX (CNOT) gate has a **control** qubit and a **target** qubit. When they're adjacent (e.g., q0 → q1), it's easy to draw. But when they're far apart (e.g., q0 → q7), we need a vertical line spanning 7 wires.
-
-### How We Render It
-
-```
-q0  ──●──────  ← Control dot (filled circle)
-      │
-q1  ──┼──────  ← Vertical line passes through
-      │
-q2  ──┼──────
-      │
-q3  ──┼──────
-      │
-q4  ──┼──────
-      │
-q5  ──┼──────
-      │
-q6  ──┼──────
-      │
-q7  ──⊕──────  ← Target gate (CX box)
-```
-
-### Model Representation
+### Annotated Source Code
+We construct `gatePlacement.js`:
 
 ```javascript
-{
-  id: "gate_123",
-  type: "CX",
-  controls: [0],    // control on q0
-  targets: [7],     // target on q7
-  column: 5,
-  params: {}
+export class GatePlacement {
+  constructor(model, renderer) {
+    this.model = model;
+    this.renderer = renderer;
+    this.setupDropZones();
+  }
+
+  setupDropZones() {
+    const grid = document.getElementById('circuit-grid');
+    
+    grid.addEventListener('dragover', (e) => {
+      e.preventDefault();
+    });
+
+    grid.addEventListener('drop', (e) => {
+      e.preventDefault();
+      const type = e.dataTransfer.getData('text/plain');
+      const targetCell = e.target.closest('.grid-cell');
+      if (targetCell) {
+        const row = parseInt(targetCell.dataset.row);
+        const col = parseInt(targetCell.dataset.col);
+        this.model.addGate({ type, targets: [row], column: col });
+      }
+    });
+  }
 }
 ```
 
-### Rendering Strategy
+### Line-by-Line Code Explanation
+*   `Line 1-6`: Saves renderer references.
+*   `Line 8-15`: Declares grid drop listeners.
+*   `Line 17-26`: Extracts the gate type from `dataTransfer` and parses coordinates on drop.
 
-1. The **gate box** (⊕) is placed on the target cell (column 5, row 7)
-2. The **control dot** (●) is placed on the control cell (column 5, row 0)
-3. An **SVG line** connects them vertically through all qubits in between
+---
+
+## Lesson 9: Add OpenQASM Generator (`qasmGenerator.js`)
+
+### File Design
+*   **Why this file exists:** Converts visual circuit configurations into text source code.
+*   **Responsibility:** Serialize gate objects.
+*   **Inputs:** `CircuitModel` data arrays.
+*   **Outputs:** Valid OpenQASM 2.0 source code string.
+
+### Annotated Source Code
+We write the compiler layout:
 
 ```javascript
-// In circuitRenderer.js → _renderControlLines()
-const x = gate.column * CELL_SIZE + CELL_SIZE / 2;   // center of column
-const y1 = minQubit * CELL_SIZE + CELL_SIZE / 2;      // top qubit center
-const y2 = maxQubit * CELL_SIZE + CELL_SIZE / 2;      // bottom qubit center
+export class QASMGenerator {
+  generate(model) {
+    const lines = [
+      'OPENQASM 2.0;',
+      'include "qelib1.inc";',
+      `qreg q[8];`,
+      `creg c[8];`
+    ];
 
-// SVG line from (x, y1) to (x, y2)
-const line = createSVGElement('line');
-line.setAttribute('x1', x); line.setAttribute('y1', y1);
-line.setAttribute('x2', x); line.setAttribute('y2', y2);
+    const sorted = [...model.gates].sort((a, b) => a.column - b.column);
+    for (const g of sorted) {
+      if (g.type === 'H') {
+        lines.push(`h q[${g.targets[0]}];`);
+      } else if (g.type === 'X') {
+        lines.push(`x q[${g.targets[0]}];`);
+      }
+    }
+    return lines.join('\n');
+  }
+}
 ```
 
-### QASM Output
-
-```
-cx q[0],q[7];    // control first, then target
-```
+### Line-by-Line Code Explanation
+*   `Line 1-9`: Writes version header and sets up registers.
+*   `Line 10`: Sorts gates by columns so instructions appear in time order.
+*   `Line 11-17`: Iterates through gates, converting them to corresponding OpenQASM commands.
+*   `Line 18`: Joins the array of lines with newlines.
 
 ---
 
-## 9. QASM Generator Flow
+## Lesson 10: Build Backend (`main.py` & `simulator.py`)
 
-The QASM Generator converts the visual circuit into text code.
+### File Design
+*   **Why this file exists:** Runs a FastAPI server to run simulation pipelines using Qiskit.
+*   **Responsibility:** Validate QASM payloads and process quantum probabilities.
+*   **Inputs:** HTTP POST requests.
+*   **Outputs:** Counts mapping dictionaries.
 
-### Step-by-Step Flow
-
-```
-Step 1: User places gates on the circuit
-        ↓
-Step 2: CircuitModel stores gate objects
-        gates = [
-          { type:"H",  targets:[0], column:0 },
-          { type:"CX", controls:[0], targets:[7], column:1 },
-          { type:"MEASURE", targets:[0], column:2 },
-        ]
-        ↓
-Step 3: QASMGenerator.generate(model) is called
-        ↓
-Step 4: Header is generated
-        "OPENQASM 2.0;"
-        'include "qelib1.inc";'
-        ↓
-Step 5: Registers are declared
-        "qreg q[8];"
-        "creg c[8];"
-        ↓
-Step 6: Gates are sorted by column and converted
-        column 0: { type:"H", targets:[0] }     → "h q[0];"
-        column 1: { type:"CX", controls:[0], targets:[7] } → "cx q[0],q[7];"
-        column 2: { type:"MEASURE", targets:[0] } → "measure q[0] -> c[0];"
-        ↓
-Step 7: Final QASM string is assembled and returned
-```
-
-### Output
-
-```
-OPENQASM 2.0;
-include "qelib1.inc";
-
-qreg q[8];
-creg c[8];
-
-h q[0];
-cx q[0],q[7];
-measure q[0] -> c[0];
-```
-
----
-
-## 10. QASM Parser Flow
-
-The QASM Parser converts text code back into the visual circuit.
-
-### Step-by-Step Flow
-
-```
-Step 1: User types or pastes QASM into the editor
-        ↓
-Step 2: User clicks "Apply"
-        ↓
-Step 3: QASMParser.parse(qasmString) is called
-        ↓
-Step 4: Each line is processed:
-        "OPENQASM 2.0;"      → Skip (header)
-        'include "qelib1.inc";' → Skip (include)
-        "qreg q[8];"         → Set numQubits = 8
-        "creg c[8];"         → Skip
-        "h q[0];"            → { type:"H", targets:[0] }
-        "cx q[0],q[7];"      → { type:"CX", controls:[0], targets:[7] }
-        ↓
-Step 5: Columns are assigned automatically
-        H  → column 0 (q0 free)
-        CX → column 1 (q0 used in col 0)
-        ↓
-Step 6: Gates array is returned
-        ↓
-Step 7: model.setGates(gates) updates the model
-        ↓
-Step 8: "circuit-changed" event fires
-        ↓
-Step 9: Renderer re-draws the circuit with the parsed gates
-```
-
----
-
-## 11. Backend Deep-Dive
-
-### FastAPI Structure
+### Annotated Source Code
+We implement the Python server:
 
 ```python
-# main.py — The server entry point
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
+from simulator import simulate_circuit
 
-from fastapi import FastAPI
-app = FastAPI(title="Quantum Studio API")
+app = FastAPI()
 
-# Endpoint definition:
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+class CircuitRequest(BaseModel):
+    qasm: str
+    shots: int = 1024
+
 @app.post("/run")
-async def run_simulation(request: RunRequest):
+async def run_simulation(request: CircuitRequest):
     result = simulate_circuit(request.qasm, request.shots)
+    if not result.get("success"):
+        raise HTTPException(status_code=400, detail=result.get("error"))
     return result
 ```
 
-### How Each Endpoint Works
-
-| Endpoint | Method | Input | Action | Output |
-|----------|--------|-------|--------|--------|
-| `/health` | GET | — | Returns status | `{"status": "ok"}` |
-| `/run` | POST | `{qasm, shots}` | Qiskit simulation | `{counts, shots}` |
-| `/save` | POST | `{name, qasm, model_json}` | SQLite INSERT | `{id, message}` |
-| `/load/{id}` | GET | URL param `id` | SQLite SELECT | `{id, name, qasm, ...}` |
-| `/circuits` | GET | — | SQLite SELECT ALL | `[{id, name, date}]` |
-| `/generate-qasm` | POST | `{model_json}` | Convert model → QASM | `{qasm}` |
-| `/parse-qasm` | POST | `{qasm}` | Convert QASM → model | `{gates, errors}` |
-
-### Request → Response Flow
-
-```
-Frontend: fetch('/run', { body: { qasm: "...", shots: 1024 } })
-    ↓
-FastAPI: Pydantic validates the request body
-    ↓
-Endpoint: run_simulation() calls simulate_circuit()
-    ↓
-simulator.py: Qiskit parses QASM → runs simulation → returns counts
-    ↓
-FastAPI: Returns JSON response to frontend
-    ↓
-Frontend: chart.updateResults(response.counts)
-```
+### Line-by-Line Code Explanation
+*   `Line 1-4`: Imports FastAPI and the local Qiskit simulator module.
+*   `Line 6`: Initializes the FastAPI application instance.
+*   `Line 8-14`: Sets up CORS configuration to allow connections from local html files.
+*   `Line 16-18`: Defines request schema configurations using Pydantic validation.
+*   `Line 20-25`: Sets up POST endpoint routes, running the simulation and returning results.
 
 ---
 
-## 12. Database Schema
+## Lesson 11: Connect Frontend and Backend (`backendAPI.js`)
 
-### Tables
+### File Design
+*   **Why this file exists:** Network client layer handling all backend API calls.
+*   **Responsibility:** Wrapper for request logic.
+*   **Inputs:** QASM strings.
+*   **Outputs:** Simulation data counts objects.
 
-#### `circuits` — Saved Circuits
+### Annotated Source Code
+We define `backendAPI.js`:
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | INTEGER | Auto-increment primary key |
-| `name` | TEXT | Circuit name ("Bell State") |
-| `qasm` | TEXT | OpenQASM 2.0 source code |
-| `model_json` | TEXT | Circuit model as JSON string |
-| `created_at` | TEXT | ISO timestamp |
+```javascript
+export class BackendAPI {
+  constructor(baseUrl) {
+    this.baseUrl = baseUrl;
+  }
 
-#### `jobs` — Simulation Jobs
+  async runCircuit(qasm, shots = 1024) {
+    const res = await fetch(`${this.baseUrl}/run`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ qasm, shots })
+    });
+    if (!res.ok) {
+      throw new Error("HTTP error: " + res.status);
+    }
+    return await res.json();
+  }
 
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | INTEGER | Auto-increment primary key |
-| `circuit_id` | INTEGER | Foreign key → circuits.id |
-| `status` | TEXT | "pending", "running", "complete" |
-| `created_at` | TEXT | ISO timestamp |
+  async isHealthy() {
+    try {
+      const res = await fetch(`${this.baseUrl}/health`);
+      return res.ok;
+    } catch {
+      return false;
+    }
+  }
+}
+```
 
-#### `results` — Simulation Results
-
-| Column | Type | Description |
-|--------|------|-------------|
-| `id` | INTEGER | Auto-increment primary key |
-| `job_id` | INTEGER | Foreign key → jobs.id |
-| `counts_json` | TEXT | Measurement counts JSON |
-| `statevector_json` | TEXT | Optional statevector data |
-| `created_at` | TEXT | ISO timestamp |
-
-### Why JSON Strings in SQLite?
-
-SQLite doesn't have a JSON column type. We store complex data (gate arrays, count dictionaries) as JSON strings in TEXT columns. Python's `json.dumps()` and `json.loads()` convert between Python objects and JSON strings.
+### Line-by-Line Code Explanation
+*   `Line 1-5`: Saves baseUrl parameters.
+*   `Line 7-17`: Sends QASM code in a JSON payload via POST requests.
+*   `Line 19-27`: Performs health checks to determine backend status.
 
 ---
 
-## 13. Qiskit Integration
+## Lesson 12: Run Qiskit Circuits (`simulator.py`)
 
-### Key Qiskit Concepts
+### File Design
+*   **Why this file exists:** Connects Python logic to Qiskit.
+*   **Responsibility:** Parse QASM strings, execute circuits on AerSimulators, and format output keys.
+*   **Inputs:** QASM strings.
+*   **Outputs:** Dictionary containing formatted measurement counts.
 
-#### QuantumCircuit
-
-```python
-from qiskit import QuantumCircuit
-
-# Create a circuit with 8 qubits and 8 classical bits
-qc = QuantumCircuit(8, 8)
-
-# Apply gates
-qc.h(0)          # Hadamard on qubit 0
-qc.x(1)          # Pauli-X (NOT) on qubit 1
-qc.y(2)          # Pauli-Y on qubit 2
-qc.z(3)          # Pauli-Z on qubit 3
-qc.cx(0, 7)      # CNOT: control q0, target q7
-qc.measure_all()  # Measure all qubits
-```
-
-#### Gate Reference
-
-| Gate | Qiskit Method | What It Does |
-|------|--------------|-------------|
-| H | `qc.h(0)` | Creates superposition: \|0⟩ → (|0⟩ + \|1⟩)/√2 |
-| X | `qc.x(0)` | Bit flip: \|0⟩ → \|1⟩ |
-| Y | `qc.y(0)` | Bit + phase flip |
-| Z | `qc.z(0)` | Phase flip: \|1⟩ → -\|1⟩ |
-| CX | `qc.cx(0, 1)` | CNOT: flips target if control is \|1⟩ |
-| Measure | `qc.measure(0, 0)` | Collapses qubit to 0 or 1 |
-| RX | `qc.rx(θ, 0)` | X-axis rotation by angle θ |
-| QFT | (decomposed) | Quantum Fourier Transform |
-| IQFT | (decomposed) | Inverse QFT |
-
-#### Simulation
+### Annotated Source Code
+We implement `simulator.py`:
 
 ```python
-from qiskit import transpile
+from qiskit import QuantumCircuit, transpile
 from qiskit_aer import AerSimulator
 
-# Create simulator
-simulator = AerSimulator()
-
-# Transpile (optimize circuit for simulator)
-transpiled = transpile(circuit, simulator)
-
-# Run with 1024 shots
-job = simulator.run(transpiled, shots=1024)
-result = job.result()
-
-# Get measurement counts
-counts = result.get_counts()
-# {"00000000": 520, "10000001": 504}
+def simulate_circuit(qasm_string: str, shots: int = 1024) -> dict:
+    try:
+        # Load from QASM
+        circuit = QuantumCircuit.from_qasm_str(qasm_string)
+        
+        # Check for measurements
+        has_measure = any(
+            instr.operation.name == 'measure'
+            for instr in circuit.data
+        )
+        if not has_measure:
+            circuit.measure_all()
+            
+        simulator = AerSimulator()
+        transpiled_circuit = transpile(circuit, simulator)
+        
+        # Run Simulation
+        job = simulator.run(transpiled_circuit, shots=shots)
+        counts = job.result().get_counts()
+        
+        return {
+            "counts": counts,
+            "shots": shots,
+            "success": True
+        }
+    except Exception as e:
+        return {
+            "counts": {},
+            "shots": shots,
+            "success": False,
+            "error": str(e)
+        }
 ```
 
-#### Statevector
+### Line-by-Line Code Explanation
+*   `Line 1-2`: Imports core transpiler and backend simulator packages.
+*   `Line 4`: Declares simulation handler entry points.
+*   `Line 7`: Parses incoming QASM strings into QuantumCircuit object instances.
+*   `Line 10-15`: Checks for measure gates, adding measurements if missing.
+*   `Line 16-18`: Transpiles (optimizes) circuits for execution.
+*   `Line 21-22`: Runs simulation jobs and extracts result count dictionaries.
+*   `Line 24-34`: Packages counts output objects or returns descriptive errors.
+
+---
+
+## Lesson 13: Display Probability Charts (`probabilityChart.js`)
+
+### File Design
+*   **Why this file exists:** Renders results as interactive bar charts using Chart.js.
+*   **Responsibility:** Initialize canvas elements and update bars dynamically.
+*   **Inputs:** API result counts dictionaries.
+*   **Outputs:** Renders bar charts onto HTML canvas grids.
+
+### Annotated Source Code
+We write `probabilityChart.js`:
+
+```javascript
+export class ProbabilityChart {
+  constructor() {
+    this.chart = null;
+    this.initChart();
+  }
+
+  initChart() {
+    const ctx = document.getElementById('probability-chart').getContext('2d');
+    this.chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Probability',
+          data: [],
+          backgroundColor: '#00d4ff'
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+  }
+
+  updateResults(counts) {
+    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+    const labels = Object.keys(counts);
+    const probabilities = Object.values(counts).map(c => c / total);
+
+    this.chart.data.labels = labels;
+    this.chart.data.datasets[0].data = probabilities;
+    this.chart.update();
+  }
+
+  updateMockResults() {
+    const mock = { "00000000": 512, "00000001": 512 };
+    this.updateResults(mock);
+  }
+}
+```
+
+### Line-by-Line Code Explanation
+*   `Line 1-5`: Configures class setups.
+*   `Line 7-26`: Configures a Chart.js bar chart on the page canvas.
+*   `Line 28-36`: Calculates probability ratios from counts and updates labels.
+*   `Line 38-41`: Falls back to mock data if the backend is offline.
+
+---
+
+## Lesson 14: Save and Load Circuits (`database.py`)
+
+### File Design
+*   **Why this file exists:** SQLite persistence layer to save and retrieve designs.
+*   **Responsibility:** Define databases tables and handle insert/select queries.
+*   **Inputs:** Circuit schemas containing names, QASM code, and state JSON.
+*   **Outputs:** Inserts records and returns list outputs.
+
+### Annotated Source Code
+We construct `database.py`:
 
 ```python
-# Get exact quantum state (no randomness)
-from qiskit_aer import AerSimulator
+import sqlite3
+import json
 
-simulator = AerSimulator(method='statevector')
-circuit.save_statevector()
-result = simulator.run(circuit).result()
-statevector = result.get_statevector()
+DB_FILE = "circuits.db"
 
-# statevector = [0.707+0j, 0+0j, ..., 0.707+0j]
+def init_db():
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS circuits (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            qasm TEXT NOT NULL,
+            model_json TEXT NOT NULL
+        )
+    """)
+    conn.commit()
+    conn.close()
+
+def save_circuit(name: str, qasm: str, model_json: str) -> int:
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO circuits (name, qasm, model_json) VALUES (?, ?, ?)",
+        (name, qasm, model_json)
+    )
+    conn.commit()
+    new_id = cursor.lastrowid
+    conn.close()
+    return new_id
+
+def load_all_circuits() -> list:
+    conn = sqlite3.connect(DB_FILE)
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, name FROM circuits")
+    rows = cursor.fetchall()
+    conn.close()
+    return [{"id": r[0], "name": r[1]} for r in rows]
+```
+
+### Line-by-Line Code Explanation
+*   `Line 1-4`: Imports sqlite library and sets filename parameters.
+*   `Line 6-18`: Checks and creates tables using SQL DDL queries.
+*   `Line 20-30`: Runs insert commands, committing modifications to the database file.
+*   `Line 32-38`: Selects stored lists to render on front-end selection panels.
+
+---
+
+# Architecture Blueprints
+
+### Client-Side Execution Flow
+```
+ ┌──────────────┐
+ │  GatePalette  │──drag──→┌──────────────┐
+ └──────────────┘          │GatePlacement  │──addGate──→┌──────────────┐
+                           └──────────────┘             │ CircuitModel │
+ ┌──────────────┐                                       │  (State)     │
+ │   Toolbar     │──clear/undo/redo──────────────────→  │              │
+ └──────────────┘                                       └──────┬───────┘
+                                                               │
+                                                       "circuit-changed"
+                                                               │
+                                       ┌───────────────────────┼───────────────────────┐
+                                       ▼                       ▼                       ▼
+                               ┌──────────────┐        ┌──────────────┐        ┌──────────────┐
+                               │  Renderer    │        │ QASMEditor   │        │ QASMGenerator│
+                               │  (re-draw)   │        │ (update text)│        │ (gen QASM)   │
+                               └──────────────┘        └──────────────┘        └──────────────┘
 ```
 
 ---
 
-## 14. Development Roadmap
-
-### Phase 1: Static UI
-- [ ] Set up project folders
-- [ ] Create `main.css` with design tokens
-- [ ] Create `layout.css` with CSS Grid
-- [ ] Build `index.html` with all 5 regions
-- [ ] Style toolbar, sidebar, circuit, QASM, chart
-- [ ] Verify layout in browser
-
-### Phase 2: Gate Placement
-- [ ] Create `gatePalette.js` — render gate cards
-- [ ] Create `gatePlacement.js` — drag-and-drop
-- [ ] Test dragging gates onto grid cells
-- [ ] Implement parameter modal for RX, RY, RZ
-
-### Phase 3: Circuit Model
-- [ ] Create `circuitModel.js` — gate storage
-- [ ] Implement `addGate()`, `removeGate()`, `clearAll()`
-- [ ] Implement undo/redo stack
-- [ ] Test model operations in console
-
-### Phase 4: QASM Generation
-- [ ] Create `qasmGenerator.js`
-- [ ] Convert single-qubit gates to QASM
-- [ ] Convert controlled gates to QASM
-- [ ] Convert parameterized gates to QASM
-- [ ] Test with various circuit configurations
-
-### Phase 5: QASM Parsing
-- [ ] Create `qasmParser.js`
-- [ ] Parse single-qubit instructions
-- [ ] Parse controlled instructions
-- [ ] Parse parameterized instructions
-- [ ] Implement column assignment algorithm
-- [ ] Test roundtrip: generate → parse → generate
-
-### Phase 6: Simulation
-- [ ] Set up FastAPI backend (`main.py`)
-- [ ] Create `simulator.py` with Qiskit
-- [ ] Implement `/run` endpoint
-- [ ] Test simulation with Bell state circuit
-- [ ] Handle Qiskit import errors gracefully
-
-### Phase 7: Probability Distribution
-- [ ] Create `probabilityChart.js`
-- [ ] Initialize Chart.js with dark theme
-- [ ] Display simulation results
-- [ ] Show top states summary
-- [ ] Test with various result distributions
-
-### Phase 8: Save/Load
-- [ ] Create SQLite database module
-- [ ] Implement `/save` and `/load` endpoints
-- [ ] Create save/load modals in frontend
-- [ ] Test save → load roundtrip
-- [ ] Implement localStorage fallback
-
-### Phase 9: Testing & Polish
-- [ ] Test all gate types (single, controlled, param, special)
-- [ ] Test non-adjacent controlled gates (q0 → q7)
-- [ ] Test QASM roundtrip (generate → edit → apply)
-- [ ] Test offline mode (no backend)
-- [ ] Cross-browser testing (Chrome, Firefox, Edge)
-- [ ] Responsive layout testing
-
----
-
-## 15. Glossary
-
-| Term | Definition |
-|------|-----------|
-| **Qubit** | A quantum bit — can be 0, 1, or both (superposition) |
-| **Gate** | An operation on one or more qubits |
-| **Circuit** | A sequence of gates applied to qubits |
-| **Hadamard (H)** | Creates an equal superposition of \|0⟩ and \|1⟩ |
-| **CNOT (CX)** | Flips the target qubit if the control qubit is \|1⟩ |
-| **Measurement** | Collapses a qubit's superposition to 0 or 1 |
-| **Superposition** | A qubit being in a combination of 0 and 1 states |
-| **Entanglement** | Two qubits linked so measuring one affects the other |
-| **OpenQASM** | Text format for describing quantum circuits |
-| **Qiskit** | IBM's Python SDK for quantum computing |
-| **FastAPI** | Python web framework for building APIs |
-| **DOM** | Document Object Model — browser's tree of HTML elements |
-| **CSS Grid** | 2D layout system for arranging page sections |
-| **Flexbox** | 1D layout system for arranging items in a row/column |
-| **Drag and Drop** | Browser API for dragging elements between containers |
-| **Undo/Redo** | Ability to reverse and re-apply actions |
-| **AerSimulator** | Qiskit's local quantum simulator |
-| **Shots** | Number of times a circuit is measured in simulation |
-| **Counts** | How many times each measurement outcome occurred |
-| **Statevector** | The full quantum state as complex amplitudes |
-| **Transpile** | Optimize a circuit for a specific backend |
-| **Bell State** | An entangled state: \|00⟩ + \|11⟩ (50/50 probability) |
-| **QFT** | Quantum Fourier Transform — key quantum algorithm component |
-| **Toffoli (CCX)** | A 3-qubit gate with 2 controls and 1 target |
-| **SWAP** | Exchanges the states of two qubits |
-
----
-
-## License
-
-MIT License. Built for learning.
-
----
-
-*Built with ❤️ for quantum computing education.*
-#   g u i 2  
- 
+## Glossary of Key Terms
+*   **Hadamard Gate (H):** Creates a superposition state $|+\rangle = \frac{|0\rangle+|1\rangle}{\sqrt{2}}$.
+*   **CNOT (CX):** A two-qubit gate flipping target if control index is state 1.
+*   **DOM (Document Object Model):** Internal browser tree structuring rendered pages.
+*   **Pydantic:** Type validation library used in FastAPI payloads.
+*   **AerSimulator:** High-performance local quantum simulator package from Qiskit.
