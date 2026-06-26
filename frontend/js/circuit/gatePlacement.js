@@ -77,6 +77,7 @@ export class GatePlacement {
     cardEl.setAttribute('draggable', 'true');
 
     cardEl.addEventListener('dragstart', (e) => {
+      console.log('DRAGSTART:', gateType);
       this._draggedGateType = gateType;
       e.dataTransfer.setData('text/plain', gateType);
       e.dataTransfer.effectAllowed = 'copy';
@@ -140,6 +141,7 @@ export class GatePlacement {
         const col = parseInt(cell.dataset.col);
         const row = parseInt(cell.dataset.row);
         const gateType = e.dataTransfer.getData('text/plain') || this._draggedGateType;
+        console.log('DROP:', { gateType, col, row, textPlain: e.dataTransfer.getData('text/plain'), _draggedGateType: this._draggedGateType });
 
         if (!gateType) return;
 
@@ -149,9 +151,10 @@ export class GatePlacement {
 
       // Also allow click-to-place when in pending state
       cell.addEventListener('click', () => {
+        const col = parseInt(cell.dataset.col);
+        const row = parseInt(cell.dataset.row);
+        console.log('CELL CLICK:', { col, row, hasPending: !!this._pendingPlacement, pending: this._pendingPlacement });
         if (this._pendingPlacement) {
-          const col = parseInt(cell.dataset.col);
-          const row = parseInt(cell.dataset.row);
           this._completePendingPlacement(col, row);
         }
       });
@@ -168,10 +171,17 @@ export class GatePlacement {
    * @param {number} row — Qubit index
    */
   _handleDrop(gateType, col, row) {
-    if (!this._canDrop(col, row)) return;
+    console.log('_handleDrop called:', { gateType, col, row, canDrop: this._canDrop(col, row) });
+    if (!this._canDrop(col, row)) {
+      console.log('Cannot drop at', col, row);
+      return;
+    }
 
     const def = GATE_DEFS[gateType];
-    if (!def) return;
+    if (!def) {
+      console.log('No definition for', gateType);
+      return;
+    }
 
     // ── Single-qubit gates ────────────────────────────────
     if (!def.hasControls && !def.isSwap && def.qubits === 1) {
@@ -236,6 +246,7 @@ export class GatePlacement {
    * Complete a pending multi-qubit gate placement.
    */
   _completePendingPlacement(col, row) {
+    console.log('_completePendingPlacement called:', { col, row, pending: this._pendingPlacement });
     const p = this._pendingPlacement;
     if (!p) return;
 

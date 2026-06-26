@@ -85,9 +85,9 @@ async def startup():
     Initializes the SQLite database (creates tables if needed).
     """
     init_db()
-    print("⚛ Quantum Studio API is running!")
-    print("  → Docs: http://localhost:8000/docs")
-    print("  → Health: http://localhost:8000/health")
+    print("Quantum Studio API is running!")
+    print("  -> Docs: http://localhost:8000/docs")
+    print("  -> Health: http://localhost:8000/health")
 
 
 # ══════════════════════════════════════════════════════════════

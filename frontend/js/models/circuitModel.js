@@ -54,7 +54,7 @@
 const NUM_QUBITS = 8;
 const INITIAL_COLUMNS = 12;
 const MAX_UNDO_STACK = 50;
-
+ 
 // ── Gate Definitions (metadata) ─────────────────────────────
 // This table tells us which gates need controls, targets, params
 export const GATE_DEFS = {

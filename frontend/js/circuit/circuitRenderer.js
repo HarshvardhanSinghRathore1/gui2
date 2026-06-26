@@ -39,7 +39,7 @@ export class CircuitRenderer {
    * @param {CircuitModel} model — The circuit data model
    */
   constructor(model) {
-    /** @type {CircuitModel} */
+    /** @type {CircuitModel} */ 
     this.model = model;
 
     // ── DOM References ──────────────────────────────────────

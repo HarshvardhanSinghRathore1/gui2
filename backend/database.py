@@ -95,7 +95,7 @@ def init_db():
         conn.execute(CREATE_JOBS_TABLE)
         conn.execute(CREATE_RESULTS_TABLE)
         conn.commit()
-        print(f"✓ Database initialized at: {DB_PATH}")
+        print(f"Database initialized at: {DB_PATH}")
     finally:
         conn.close()
 
